@@ -9,10 +9,11 @@ export default defineConfig({
     integrations: [mdx()],
     vite: {
         plugins: [tailwindcss()],
-        server: {
-            watch: {
-                usePolling: true,
-            },
-        },
+        // windows 側にディレクトリを置いているとき、hot reload が効かないので、以下の設定を追加する
+        // server: {
+        //     watch: {
+        //         usePolling: true,
+        //     },
+        // },
     },
 });
