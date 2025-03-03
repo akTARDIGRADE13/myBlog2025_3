@@ -1,11 +1,11 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Layout from '../components/Layout/Layout.astro';
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Home" description="Welcome to our website!">
+	<section class="py-8">
+		<h2 class="text-3xl font-bold mb-4">Welcome to {Astro.site}</h2>
+		<p class="text-lg">ここにサイトの概要や最新のお知らせなどを掲載します。</p>
+	</section>
+	<!-- ここに最新記事のプレビューなどを追加してもよい -->
 </Layout>

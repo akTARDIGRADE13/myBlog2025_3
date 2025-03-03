@@ -1,0 +1,18 @@
+---
+import siteConfig from '../../config/site.config';
+---
+
+<header class="bg-gray-800 text-white py-4">
+    <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-xl font-bold">
+            <a href="/">{siteConfig.siteName}</a>
+        </h1>
+        <nav>
+            <ul class="flex space-x-4">
+                <li><a href="/" class="hover:underline">Home</a></li>
+                <li><a href="/blog" class="hover:underline">Blog</a></li>
+                <!-- 将来的に他のページを追加する場合 -->
+            </ul>
+        </nav>
+    </div>
+</header>
