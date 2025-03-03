@@ -9,5 +9,10 @@ export default defineConfig({
     integrations: [mdx()],
     vite: {
         plugins: [tailwindcss()],
+        server: {
+            watch: {
+                usePolling: true,
+            },
+        },
     },
 });
