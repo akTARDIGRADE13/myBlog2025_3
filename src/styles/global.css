@@ -1,5 +1,36 @@
 @import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Body全体の基本設定 */
+body {
+    @apply text-gray-800 bg-white;
+    line-height: 1.6;
+    font-family: 'Inter', sans-serif;
+}
+
+/* 見出しのスタイル */
+h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+    margin-bottom: 1rem;
+}
+
+/* 段落のスタイル */
+p {
+    @apply mb-4;
+}
+
+/* ブログ記事内のコンテンツ向けスタイル例 */
+.article-content {
+    @apply prose prose-lg max-w-none;
+}
+
+/* リンクのスタイル */
+a {
+    @apply text-blue-500 hover:text-blue-700;
+    text-decoration: underline;
+}
+
+/* その他、必要に応じたカスタムクラス */
+/* 例: カードコンポーネント用 */
+.card {
+    @apply bg-white rounded-lg shadow p-4;
+}
