@@ -2,16 +2,31 @@
 import siteConfig from '../../config/site.config';
 ---
 
-<header class="bg-gray-800 text-white py-4">
-    <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-xl font-bold">
-            <a href="/">{siteConfig.siteName}</a>
+<header class="bg-gray-800 text-white py-2">
+    <div class="container mx-auto flex flex-col items-center px-4">
+        <!-- タイトル -->
+        <h1 class="text-4xl font-bold mb-4 text-center relative inline-block px-4 py-2 border-b-4 border-blue-400">
+            {siteConfig.siteName}
         </h1>
+        <!-- ナビゲーション -->
         <nav>
-            <ul class="flex space-x-4">
-                <li><a href="/" class="hover:underline">Home</a></li>
-                <li><a href="/blog" class="hover:underline">Blog</a></li>
-                <!-- 将来的に他のページを追加する場合 -->
+            <ul class="flex space-x-15 mb-2">
+                <li>
+                    <a
+                        href="/"
+                        class="text-xl text-white focus:outline-none cursor-pointer transition-colors duration-200 hover:text-blue-300"
+                    >
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a
+                        href="/blog"
+                        class="text-xl text-white focus:outline-none cursor-pointer transition-colors duration-200 hover:text-blue-300"
+                    >
+                        Blog
+                    </a>
+                </li>
             </ul>
         </nav>
     </div>
