@@ -7,22 +7,22 @@ const { title, description } = Astro.props;
 
 <!DOCTYPE html>
 <html lang="ja">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{title ? `${title} - ${Astro.site}` : Astro.site}</title>
-        {description && <meta name="description" content={description} />}
-        <!-- Tailwind CSS のスタイル読み込み -->
-        <link rel="stylesheet" href="/src/styles/global.css" />
-    </head>
-    <body class="flex flex-col min-h-screen">
-        <!-- ヘッダー -->
-        <Header />
-        <!-- メインコンテンツ -->
-        <main class="flex-grow container mx-auto p-4">
-            <slot />
-        </main>
-        <!-- フッター -->
-        <Footer />
-    </body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title ? `${title} - ${Astro.site}` : Astro.site}</title>
+    {description && <meta name="description" content={description} />}
+    <!-- Tailwind CSS のスタイル読み込み -->
+    <link rel="stylesheet" href="/src/styles/global.css" />
+  </head>
+  <body class="flex flex-col min-h-screen">
+    <!-- ヘッダー -->
+    <Header />
+    <!-- メインコンテンツ -->
+    <main class="flex-grow container mx-auto px-25 py-4">
+      <slot />
+    </main>
+    <!-- フッター -->
+    <Footer />
+  </body>
 </html>
