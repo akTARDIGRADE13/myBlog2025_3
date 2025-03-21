@@ -1,0 +1,94 @@
+---
+import Layout from '../../components/Layout/Layout.astro';
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+
+const pageSize = 5;
+
+// getStaticPaths 内で更新情報を取得し、ページ数を計算する
+export async function getStaticPaths() {
+const pageSize = 5;
+  const updates: CollectionEntry<'updates'>[] = await getCollection('updates');
+  updates.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+  const totalPages = Math.ceil(updates.length / pageSize);
+  return Array.from({ length: totalPages }, (_, i) => ({
+    params: { page: String(i + 1) }
+  }));
+}
+
+// ページ本体用に更新情報を再取得（キャッシュされるので問題ありません）
+const updates: CollectionEntry<'updates'>[] = await getCollection('updates');
+updates.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+const totalPages = Math.ceil(updates.length / pageSize);
+
+// URLパラメータから現在のページ番号を取得（未指定の場合は "1"）
+const pageParam: string = Astro.params.page ?? "1";
+const currentPage = parseInt(pageParam);
+
+// 現在のページで表示する更新情報を抽出
+const startIndex = (currentPage - 1) * pageSize;
+const currentUpdates = updates.slice(startIndex, startIndex + pageSize);
+---
+
+<Layout title="更新情報" description="更新情報一覧">
+  <section class="py-4">
+    <div class="container mx-auto px-4">
+      <h2 class="text-4xl font-bold mb-4">更新情報（ページ {currentPage} / {totalPages}）</h2>
+      <ul class="space-y-4">
+        {currentUpdates.map((update) => (
+          <li class="p-4 border border-gray-200 rounded shadow-sm">
+            <p class="text-lg font-semibold">
+              {update.data.title}
+              <span class="text-sm text-gray-500 ml-2">
+                {new Date(update.data.date).toLocaleDateString('ja-JP')}
+              </span>
+            </p>
+            <p class="text-gray-600">
+              {update.body}
+            </p>
+          </li>
+        ))}
+      </ul>
+
+      <!-- ページネーション -->
+      <nav class="mt-8">
+        <ul class="flex flex-wrap gap-2 justify-center">
+          {currentPage > 1 && (
+            <li>
+              <a 
+                href={`/updates/${currentPage - 1}`} 
+                class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200"
+              >
+                前のページ
+              </a>
+            </li>
+          )}
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
+            <li>
+              <a 
+                href={`/updates/${pageNumber}`} 
+                class={`px-3 py-1 border border-gray-300 rounded ${
+                  currentPage === pageNumber ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'
+                }`}
+              >
+                {pageNumber}
+              </a>
+            </li>
+          ))}
+
+          {currentPage < totalPages && (
+            <li>
+              <a 
+                href={`/updates/${currentPage + 1}`} 
+                class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200"
+              >
+                次のページ
+              </a>
+            </li>
+          )}
+        </ul>
+      </nav>
+    </div>
+  </section>
+</Layout>
