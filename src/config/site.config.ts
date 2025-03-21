@@ -6,7 +6,7 @@ interface SiteConfig {
 }
 
 const siteConfig: SiteConfig = {
-    siteName: "akTARs.'s Blog",
+    siteName: "akTAR.'s Blog",
     description: "A blog built with Astro and Cloudflare Pages",
     url: "https://aktardigrade13-blog.pages.dev",
 };
