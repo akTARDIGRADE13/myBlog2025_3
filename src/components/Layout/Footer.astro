@@ -1,31 +1,29 @@
 ---
+import Icon from '../Icon.astro';
 import siteConfig from '../../config/site.config';
 ---
+
 <footer class="bg-gray-900 text-gray-300 py-8 mt-8">
   <div class="container mx-auto flex justify-center space-x-8">
     <!-- GitHub アイコン -->
     <a
-      href="https://github.com/your-github"
+      href="https://github.com/akTARDIGRADE13"
       target="_blank"
       rel="noopener noreferrer"
       aria-label="GitHub"
       class="hover:text-white transition-colors duration-200"
     >
-      <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.26.82-.577v-2.165C6.927 20.1 6.29 18.78 6.29 18.78c-.546-1.387-1.333-1.757-1.333-1.757-1.09-.745.083-.73.083-.73 1.205.085 1.84 1.236 1.84 1.236 1.07 1.835 2.807 1.305 3.492.997.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.93 0-1.31.47-2.38 1.236-3.22-.124-.303-.536-1.523.116-3.176 0 0 1.008-.322 3.3 1.23a11.48 11.48 0 013.003-.404c1.02.005 2.045.138 3.003.404 2.29-1.552 3.296-1.23 3.296-1.23.654 1.653.242 2.873.12 3.176.77.84 1.234 1.91 1.234 3.22 0 4.61-2.807 5.625-5.48 5.922.43.372.823 1.102.823 2.222v3.293c0 .319.218.694.825.576C20.565 21.795 24 17.295 24 12c0-6.63-5.373-12-12-12z"/>
-      </svg>
+      <Icon src="/github.png" alt="GitHub" width={24} height={24} />
     </a>
     <!-- X アイコン -->
     <a
-      href="https://x.com/your-x"
+      href="https://x.com/akTARDIGRADE13"
       target="_blank"
       rel="noopener noreferrer"
       aria-label="X"
       class="hover:text-white transition-colors duration-200"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-      </svg>
+      <Icon src="/x.png" alt="X" width={24} height={24} />
     </a>
   </div>
 </footer>
