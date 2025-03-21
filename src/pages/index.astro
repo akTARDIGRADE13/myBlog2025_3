@@ -1,11 +1,66 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import Layout from '../components/Layout/Layout.astro';
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// "updates" コレクションから Markdown ファイルを取得し、日付順（新しい順）に並べ替え
+const updates: CollectionEntry<'updates'>[] = await getCollection('updates');
+updates.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+
+// 最新の 5 件のみ抽出
+const latestUpdates = updates.slice(0, 3);
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Home" description="Welcome to our website!">
+	<!-- サイトの概要（背景画像を背景として利用） -->
+	<section class="relative bg-cover bg-center" style="background-image: url('/scenery.jpg');">
+		<div class="container mx-auto px-8 py-32 text-center">
+		  <!-- テキストコンテンツに白色の半透明背景を付与 -->
+		  <div class="bg-white/95 p-20 rounded shadow-lg mx-15">
+			<h2 class="text-5xl font-bold text-gray-900 mb-6 drop-shadow">サイトについて</h2>
+			<p class="text-2xl text-gray-800 drop-shadow">
+			  個人のブログサイトです。勉強したことをまとめたり、好きなことについて語ったりしています。<br>
+			  サイトの仕様や記事内容について気になる点がございましたら、<a href="https://github.com/akTARDIGRADE13/myBlog2025_3/issues" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">GitHub リポジトリの Issue</a>、<a href="https://x.com/akTARDIGRADE13" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">X アカウント</a>、または<a href="https://fedibird.com/@akTARDIGRADE13" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Mastodon アカウント</a>までご連絡ください。
+			</p>
+		  </div>
+		</div>
+	</section>
+	
+	<!-- 注意事項（免責事項的な内容） -->
+	<section class="py-8 bg-gray-50">
+	  <div class="container mx-auto px-4 text-center">
+		<p class="text-s text-gray-600 italic">
+			当サイトは、正確な情報の提供に努めておりますが、掲載内容の正確性や最新性については保証いたしかねます。<br>
+			また、当サイトの情報に基づいて行われた判断や行動により発生した損害について、いかなる場合も一切の責任を負いかねますので、ご了承ください。
+	  </div>
+	</section>
+	
+	<!-- 更新情報 -->
+	<section class="py-12">
+		<div class="container mx-auto px-4">
+		  <h2 class="text-4xl font-bold mb-4">更新情報</h2>
+		  <ul class="space-y-4">
+			{latestUpdates.map((update) => (
+			  <li class="p-4 border border-gray-200 rounded shadow-sm">
+				<p class="text-lg font-semibold">
+				  {update.data.title}
+				  <span class="text-sm text-gray-500 ml-2">
+					{new Date(update.data.date).toLocaleDateString('ja-JP')}
+				  </span>
+				</p>
+				<p class="text-gray-600">
+				  {update.body}
+				</p>
+			  </li>
+			))}
+		  </ul>
+		  <div class="mt-8 text-center">
+			<a href="/updates/1" class="text-blue-600 hover:underline">
+			  全ての更新情報を見る
+			</a>
+		  </div>
+		</div>
+	  </section>
+	
 </Layout>
+

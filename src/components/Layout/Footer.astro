@@ -1,0 +1,49 @@
+---
+import Icon from '../Icon.astro';
+import siteConfig from '../../config/site.config';
+---
+
+<footer class="bg-gray-900 text-gray-300 py-8 mt-8">
+  <div class="container mx-auto flex justify-center space-x-8">
+    <!-- GitHub アイコン -->
+    <a
+      href="https://github.com/akTARDIGRADE13"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="GitHub"
+      class="hover:text-white transition-colors duration-200"
+    >
+      <Icon src="/github.png" alt="GitHub" width={24} height={24} />
+    </a>
+    <!-- Qiita アイコン -->
+    <a
+      href="https://qiita.com/TARDIGRADE"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Qiita"
+      class="hover:text-white transition-colors duration-200"
+    >
+      <Icon src="/qiita.png" alt="Qiita" width={24} height={24} />
+    </a>
+    <!-- X アイコン -->
+    <a
+      href="https://x.com/akTARDIGRADE13"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="X"
+      class="hover:text-white transition-colors duration-200"
+    >
+      <Icon src="/x.png" alt="X" width={24} height={24} />
+    </a>
+    <!-- Mastdon アイコン -->
+    <a
+      href="https://fedibird.com/@akTARDIGRADE13"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Mastodon"
+      class="hover:text-white transition-colors duration-200"
+    >
+      <Icon src="/mastdon.svg" alt="Mastodon" width={24} height={24} />
+    </a>
+  </div>
+</footer>

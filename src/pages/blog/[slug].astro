@@ -1,0 +1,21 @@
+---
+import Layout from '../../components/Layout/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const { slug } = Astro.params;
+const blogPosts = await getCollection('blog');
+const post = blogPosts.find((post) => post.slug === slug);
+
+if (!post) {
+    throw new Error(`記事が見つかりません: ${slug}`);
+}
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+    <article class="prose prose-lg max-w-none">
+        <h1>{post.data.title}</h1>
+        <p class="text-sm text-gray-500">{post.data.date}</p>
+        <!-- Markdown 記事のコンテンツをレンダリング -->
+        <div set:html={post.body} />
+    </article>
+</Layout>
