@@ -26,7 +26,7 @@ export async function getStaticPaths() {
 
 const blogPosts: CollectionEntry<'blog'>[] = await getCollection('blog');
 blogPosts.sort(
-  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
 );
 const totalPages = Math.ceil(blogPosts.length / POSTS_PER_PAGE);
 
