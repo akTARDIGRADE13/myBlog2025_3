@@ -125,6 +125,7 @@ const katexMacros = {
 
 // https://astro.build/config
 export default defineConfig({
+    site: "https://aktardigrade13-blog.pages.dev",
     integrations: [
         mdx(),
     ],
