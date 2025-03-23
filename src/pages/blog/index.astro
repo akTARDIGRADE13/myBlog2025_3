@@ -7,7 +7,13 @@ import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 
 const POSTS_PER_PAGE = 10;
-const blogPosts: CollectionEntry<'blog'>[] = await getCollection('blog');
+const allPosts: CollectionEntry<'blog'>[] = await getCollection('blog');
+
+// 開発環境ならすべて、ビルド時なら "test_" を含む記事を除外
+const blogPosts = import.meta.env.DEV
+    ? allPosts
+    : allPosts.filter(post => !post.slug.includes('test_'));
+
 blogPosts.sort(
     (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
 );
