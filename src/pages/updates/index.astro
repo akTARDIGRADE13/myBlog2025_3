@@ -1,5 +1,6 @@
 ---
 import Layout from '../../components/Layout/Layout.astro';
+import Pagination from '../../components/Pagination.astro';
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 
@@ -34,32 +35,6 @@ const currentUpdates = updates.slice(startIndex, startIndex + pageSize);
             ))}
         </ul>
 
-        <!-- ページネーション -->
-        <nav class="mt-8">
-            <ul class="flex flex-wrap gap-2 justify-center">
-                {totalPages > 1 && (
-                <li>
-                    <a 
-                    href="/updates/2" 
-                    class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200"
-                    >
-                    次のページ
-                    </a>
-                </li>
-                )}
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
-                <li>
-                    <a 
-                    href={pageNumber === 1 ? '/updates/' : `/updates/${pageNumber}`}
-                    class={`px-3 py-1 border border-gray-300 rounded ${
-                        currentPage === pageNumber ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'
-                    }`}
-                    >
-                        {pageNumber}
-                    </a>
-                </li>
-                ))}
-            </ul>
-        </nav>
+        <Pagination currentPage={currentPage} totalPages={totalPages} basePath='/updates' />
     </section>
 </Layout>
