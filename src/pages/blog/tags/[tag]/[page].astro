@@ -1,0 +1,69 @@
+---
+import Layout from "../../../../components/Layout/Layout.astro";
+import BlogPostCard from "../../../../components/BlogPostCard.astro";
+import Pagination from "../../../../components/Pagination.astro";
+import TagList from "../../../../components/TagList.astro";
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+
+const POSTS_PER_PAGE = 10;
+
+// getStaticPaths では、全記事からユニークなタグを抽出し、
+// 各タグについて投稿数から総ページ数を計算して、ページ2以降のパスを生成します。
+export async function getStaticPaths() {
+    const POSTS_PER_PAGE = 10;
+    const blogPosts: CollectionEntry<'blog'>[] = await getCollection('blog');
+    blogPosts.sort(
+        (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+    );
+    const tagSet = new Set<string>();
+    blogPosts.forEach(post => {
+        if (post.data.tags && Array.isArray(post.data.tags)) {
+            post.data.tags.forEach((tag: string) => tagSet.add(tag));
+        }
+    });
+
+    const paths = [];
+    // 各タグごとにフィルタリングして総ページ数を計算
+    for (const tag of Array.from(tagSet)) {
+        const filtered = blogPosts.filter(post => post.data.tags.includes(tag));
+        const totalPages = Math.ceil(filtered.length / POSTS_PER_PAGE);
+        // 1ページ目は index.astro で扱うので、2ページ目以降のみ生成
+        if (totalPages > 1) {
+            for (let i = 2; i <= totalPages; i++) {
+                paths.push({ params: { tag, page: String(i) } });
+            }
+        }
+    }
+    return paths;
+}
+
+// Astro.params から tag と page を取得
+const { tag, page } = Astro.params as { tag: string; page: string };
+const currentPage = parseInt(page);
+
+// 全ブログ記事を取得してソート
+const blogPosts: CollectionEntry<'blog'>[] = await getCollection('blog');
+blogPosts.sort(
+    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+// 指定タグの記事に絞り込み
+const filteredPosts = blogPosts.filter(post => post.data.tags.includes(tag));
+const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+const paginatedPosts = filteredPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
+---
+<Layout title={`タグ: ${tag}`} description={`タグ ${tag} の記事一覧`}>
+    <section class="py-4">
+        <!-- 全記事からユニークなタグ一覧を表示 -->
+        <TagList posts={blogPosts} />
+
+        <h2 class="text-3xl font-bold mb-4">タグ: {tag}（ページ {currentPage} / {totalPages}）</h2>
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {paginatedPosts.map(post => <BlogPostCard post={post} />)}
+        </ul>
+
+        <!-- ページネーション -->
+        <Pagination currentPage={currentPage} totalPages={totalPages} basePath={`/blog/tags/${tag}`} />
+    </section>
+</Layout>
