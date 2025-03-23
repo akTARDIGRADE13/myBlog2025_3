@@ -7,6 +7,23 @@ import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 
 const POSTS_PER_PAGE = 10;
+
+// getStaticPaths で 2 ページ目以降のルートを生成
+export async function getStaticPaths() {
+    const POSTS_PER_PAGE = 10;
+    const blogPosts: CollectionEntry<'blog'>[] = await getCollection('blog');
+    blogPosts.sort(
+        (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+    );
+    const totalPages = Math.ceil(blogPosts.length / POSTS_PER_PAGE);
+    // ページ1 は index.astro で扱うため、ここでは 2 ページ目以降のみ生成
+    return totalPages > 1
+        ? Array.from({ length: totalPages - 1 }, (_, i) => ({
+            params: { page: String(i + 2) }
+        }))
+        : [];
+}
+
 const allPosts: CollectionEntry<'blog'>[] = await getCollection('blog');
 
 // 開発環境ならすべて、ビルド時なら "test_" を含む記事を除外
@@ -19,10 +36,11 @@ blogPosts.sort(
 );
 const totalPages = Math.ceil(blogPosts.length / POSTS_PER_PAGE);
 
-// 1 ページ目
-const currentPage = 1;
-const startIndex = 0;
-const paginatedPosts = blogPosts.slice(startIndex, POSTS_PER_PAGE);
+// Astro.params.page は必ず存在する前提（ページ2以降のみ）
+const pageParam: string = Astro.params.page ?? "2";
+const currentPage = parseInt(pageParam);
+const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+const paginatedPosts = blogPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
 ---
 
 <Layout title="Blog" description="ブログ一覧">

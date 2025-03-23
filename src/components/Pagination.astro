@@ -1,0 +1,46 @@
+---
+interface Props {
+    currentPage: number;
+    totalPages: number;
+    basePath: string;
+}
+const { currentPage, totalPages, basePath } = Astro.props as Props;
+---
+<nav class="mt-8">
+    <ul class="flex flex-wrap gap-2 justify-center">
+        {currentPage > 1 && (
+        <li>
+            <a 
+            href={currentPage - 1 === 1 ? `${basePath}/` : `${basePath}/${currentPage - 1}`}
+            class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200 transition"
+            >
+                前のページ
+            </a>
+        </li>
+        )}
+
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+        <li>
+            <a 
+            href={pageNum === 1 ? `${basePath}/` : `${basePath}/${pageNum}`}
+            class={`px-3 py-1 border border-gray-300 rounded ${
+                currentPage === pageNum ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'
+            } transition`}
+            >
+            {pageNum}
+            </a>
+        </li>
+        ))}
+
+        {currentPage < totalPages && (
+        <li>
+            <a 
+            href={`${basePath}/${currentPage + 1}`}
+            class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200 transition"
+            >
+                次のページ
+            </a>
+        </li>
+        )}
+    </ul>
+</nav>

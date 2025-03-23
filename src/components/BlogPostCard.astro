@@ -1,0 +1,59 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'blog'>
+}
+
+const { post } = Astro.props as Props;
+
+// 日付の変換
+const dateObj = new Date(post.data.date);
+const updatedObj = new Date(post.data.updated);
+
+// アイキャッチ画像（空の場合はデフォルト画像）
+const eyecatchSrc =
+    post.data.eyecatch && post.data.eyecatch.trim() !== ""
+    ? post.data.eyecatch
+    : "/default-eyecatch.png";
+---
+
+<li class="border p-4 rounded hover:shadow-lg transition">
+    <a href={`/blog/${post.slug}`}>
+        <div class="flex flex-col md:flex-row gap-5">
+        {/* アイキャッチ画像領域 */}
+        <div class="md:w-60 flex-none aspect-video">
+            <img
+            src={eyecatchSrc}
+            alt={post.data.title}
+            class="w-full h-full object-contain"
+            />
+        </div>
+        {/* 文章エリア */}
+        <div class="md:w-96 flex flex-col h-full">
+            <div>
+            <h3 class="text-xl font-semibold">{post.data.title}</h3>
+            </div>
+            <div class="mt-auto">
+            <p class="text-sm text-gray-400">
+                投稿日: {dateObj.toLocaleDateString('ja-JP')}
+            </p>
+            {updatedObj.getTime() !== dateObj.getTime() && (
+                <p class="text-sm text-gray-400">
+                最終更新日: {updatedObj.toLocaleDateString('ja-JP')}
+                </p>
+            )}
+            {post.data.tags && post.data.tags.length > 0 && (
+                <div class="flex flex-wrap gap-2 mt-2">
+                {post.data.tags.map((tag) => (
+                    <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs">
+                    {tag}
+                    </span>
+                ))}
+                </div>
+            )}
+            </div>
+        </div>
+        </div>
+    </a>
+</li>

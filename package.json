@@ -13,6 +13,8 @@
     "@tailwindcss/vite": "^4.0.14",
     "astro": "^5.4.1",
     "katex": "^0.16.21",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0",
     "tailwindcss": "^4.0.14"
   },
   "devDependencies": {

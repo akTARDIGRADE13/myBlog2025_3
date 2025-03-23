@@ -1,0 +1,40 @@
+---
+import Layout from '../../components/Layout/Layout.astro';
+import Pagination from '../../components/Pagination.astro';
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+
+const pageSize = 10;
+const updates: CollectionEntry<'updates'>[] = await getCollection('updates');
+// 更新日の降順にソート
+updates.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+const totalPages = Math.ceil(updates.length / pageSize);
+
+// 1 ページ目の内容（固定）
+const currentPage = 1;
+const startIndex = (currentPage - 1) * pageSize;
+const currentUpdates = updates.slice(startIndex, startIndex + pageSize);
+---
+
+<Layout title="更新情報" description="更新情報一覧">
+    <section class="py-4">
+        <h2 class="text-3xl font-bold mb-4">更新情報（ページ {currentPage} / {totalPages}）</h2>
+        <ul class="space-y-4">
+            {currentUpdates.map((update) => (
+                <li class="p-4 border border-gray-200 rounded shadow-sm">
+                    <p class="text-lg font-semibold">
+                        {update.data.title}
+                        <span class="text-sm text-gray-500 ml-2">
+                            {new Date(update.data.date).toLocaleDateString('ja-JP')}
+                        </span>
+                    </p>
+                    <p class="text-gray-600">
+                        {update.body}
+                    </p>
+                </li>
+            ))}
+        </ul>
+
+        <Pagination currentPage={currentPage} totalPages={totalPages} basePath='/updates' />
+    </section>
+</Layout>

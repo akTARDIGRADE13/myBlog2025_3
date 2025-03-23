@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+    posts: CollectionEntry<'blog'>[];
+}
+
+const { posts } = Astro.props as Props;
+
+// ブログ記事からユニークなタグを抽出
+const tagSet = new Set<string>();
+posts.forEach(post => {
+    if (post.data.tags && Array.isArray(post.data.tags)) {
+        post.data.tags.forEach((tag: string) => tagSet.add(tag));
+    }
+});
+const tags = Array.from(tagSet);
+---
+
+<div class="bg-gray-100 p-4 rounded-lg mb-8 shadow-sm">
+    <h3 class="text-xl font-bold mb-3 border-b pb-2">タグ一覧</h3>
+    <div class="flex flex-wrap gap-3">
+        {tags.map((tag) => (
+        <a 
+            href={`/blog/tags/${tag}`}
+            class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full hover:bg-blue-200 transition"
+        >
+            {tag}
+        </a>
+        ))}
+    </div>
+</div>

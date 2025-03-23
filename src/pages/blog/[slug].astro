@@ -1,21 +1,30 @@
 ---
-import Layout from '../../components/Layout/Layout.astro';
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 
+export async function getStaticPaths() {
+	const posts: CollectionEntry<'blog'>[] = await getCollection('blog');
+	return posts.map((post) => ({
+		params: { slug: post.slug },
+		props: { post }
+	}));
+}
+
 const { slug } = Astro.params;
-const blogPosts = await getCollection('blog');
-const post = blogPosts.find((post) => post.slug === slug);
+const { post } = Astro.props as { post: CollectionEntry<'blog'> };
 
 if (!post) {
-    throw new Error(`記事が見つかりません: ${slug}`);
+	throw new Error(`記事が見つかりません: ${slug}`);
 }
+
+const { Content } = await post.render();
 ---
 
-<Layout title={post.data.title} description={post.data.description}>
-    <article class="prose prose-lg max-w-none">
-        <h1>{post.data.title}</h1>
-        <p class="text-sm text-gray-500">{post.data.date}</p>
-        <!-- Markdown 記事のコンテンツをレンダリング -->
-        <div set:html={post.body} />
-    </article>
-</Layout>
+<ArticleLayout 
+	title={post.data.title} 
+	date={post.data.date} 
+	updated={post.data.updated}>
+	<!-- Markdown 記事のコンテンツ -->
+	<Content />
+</ArticleLayout>
