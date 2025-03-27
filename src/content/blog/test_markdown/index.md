@@ -117,10 +117,14 @@ greet("Python")
 2. ステップ2
 3. ステップ3
 
+**強調** や *斜体*、~~取り消し線~~ も利用できます。
+
 ### リンク
 
-[リンクの例](https://github.com/akTARDIGRADE13/myBlog2025_3)
-
 https://github.com/akTARDIGRADE13/myBlog2025_3
+
+https://www.youtube.com/watch?v=gHz8w3I5uHU
+
+https://qiita.com/TARDIGRADE/items/60ee139b840bbfffdf17
 
 ---
