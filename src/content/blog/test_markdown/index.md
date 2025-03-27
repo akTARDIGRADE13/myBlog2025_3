@@ -117,4 +117,10 @@ greet("Python")
 2. ステップ2
 3. ステップ3
 
+### リンク
+
+[リンクの例](https://github.com/akTARDIGRADE13/myBlog2025_3)
+
+https://github.com/akTARDIGRADE13/myBlog2025_3
+
 ---
