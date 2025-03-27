@@ -2,10 +2,14 @@
 import { defineConfig } from "astro/config";
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import remarkLinkCard from 'remark-link-card'
+import rehypeRaw from 'rehype-raw'
+import rehypeExternalLinks from 'rehype-external-links'
 
 import mdx from "@astrojs/mdx";
 
 import tailwindcss from "@tailwindcss/vite";
+import { getOrigQueryParams } from "astro/assets/utils";
 
 const katexMacros = {
     "\\quantity": "{\\left\\{ #1 \\right\\}}",
@@ -139,9 +143,28 @@ export default defineConfig({
         // },
     },
     markdown: {
-        remarkPlugins: [remarkMath],
+        shikiConfig: {
+            theme: 'plastic',
+            langs: [],
+            wrap: true,
+        },
+        remarkPlugins: [
+            remarkMath,
+            [ remarkLinkCard, { cache: true, shortenUrl: true }],
+        ],
         rehypePlugins: [
             [rehypeKatex, { macros: katexMacros }],
+            rehypeRaw,
+            [
+                rehypeExternalLinks,
+                {
+                    target: "_blank",
+                    filter: (node: any) => {
+                        const href = node.properties && node.properties.href;
+                        return typeof href === "string" && /^https?:\/\//.test(href);
+                    },
+                },
+            ],
         ]
     },
 });

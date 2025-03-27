@@ -11,13 +11,13 @@ tags: ["Astro", "Markdown", "ブログ"]
 
 ---
 
-# 表示テスト文書
+## 表示テスト文書
 
 この文書は、**コードブロック**、*引用*、および **表** などの Markdown 要素がどのようにレンダリングされるか確認するためのテスト用です。
 
 ---
 
-## コードブロック
+### コードブロック
 
 以下は JavaScript のサンプルコードです:
 
@@ -34,7 +34,7 @@ console.log(sum([1, 2, 3, 4])); // 10 を出力
 
 ---
 
-## C++ の例
+### C++ の例
 
 ```cpp
 #include <iostream>
@@ -48,7 +48,7 @@ int main() {
 
 ---
 
-## Go の例
+### Go の例
 
 ```go
 package main
@@ -62,7 +62,7 @@ func main() {
 
 ---
 
-## Bash の例
+### Bash の例
 
 ```bash
 #!/bin/bash
@@ -71,7 +71,7 @@ echo "Hello, Bash!"
 
 ---
 
-## Python の例
+### Python の例
 
 ```python
 def greet(name):
@@ -82,7 +82,7 @@ greet("Python")
 
 ---
 
-## 引用
+### 引用
 
 以下は引用の例です:
 
@@ -92,7 +92,7 @@ greet("Python")
 
 ---
 
-## 表
+### 表
 
 以下はシンプルな表の例です:
 
@@ -106,7 +106,7 @@ greet("Python")
 
 ---
 
-## その他の要素
+### その他の要素
 
 - **リスト:**  
   - 順不同リストの例
@@ -116,5 +116,15 @@ greet("Python")
 1. 順序付きリストの例
 2. ステップ2
 3. ステップ3
+
+**強調** や *斜体*、~~取り消し線~~ も利用できます。
+
+### リンク
+
+https://github.com/akTARDIGRADE13/myBlog2025_3
+
+https://www.youtube.com/watch?v=gHz8w3I5uHU
+
+https://qiita.com/TARDIGRADE/items/60ee139b840bbfffdf17
 
 ---
