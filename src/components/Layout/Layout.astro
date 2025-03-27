@@ -4,27 +4,40 @@ import '../../styles/global.css';
 import Header from './Header.astro';
 import Footer from './Footer.astro';
 
-const { title, description } = Astro.props;
+// eyecatch を追加。記事ごとに個別の画像パスを渡せるようにする
+const { title, eyecatch } = Astro.props;
+const defaultEyecatch = '/default-eyecatch.png'; // eyecatch 未指定時のデフォルト画像
+const fullTitle = title ? `${title} - ${Astro.site}` : Astro.site;
 ---
-
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title ? `${title} - ${Astro.site}` : Astro.site}</title>
-    {description && <meta name="description" content={description} />}
-    <!-- Tailwind CSS のスタイル読み込み -->
-    <link rel="stylesheet" href="/src/styles/global.css" />
-  </head>
-  <body class="flex flex-col min-h-screen">
-    <!-- ヘッダー -->
-    <Header />
-    <!-- メインコンテンツ -->
-    <main class="flex-grow container mx-auto px-25 py-4">
-      <slot />
-    </main>
-    <!-- フッター -->
-    <Footer />
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{fullTitle}</title>
+
+        <!-- OGP用metaタグ -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={Astro.site} />
+        <meta property="og:title" content={fullTitle} />
+        <meta property="og:image" content={eyecatch || defaultEyecatch} />
+
+        <!-- Twitterカード用metaタグ -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={fullTitle} />
+        <meta name="twitter:image" content={eyecatch || defaultEyecatch} />
+
+        <!-- Tailwind CSS のスタイル読み込み -->
+        <link rel="stylesheet" href="/src/styles/global.css" />
+    </head>
+    <body class="flex flex-col min-h-screen">
+        <!-- ヘッダー -->
+        <Header />
+        <!-- メインコンテンツ -->
+        <main class="flex-grow container mx-auto px-25 py-4">
+        <slot />
+        </main>
+        <!-- フッター -->
+        <Footer />
+    </body>
 </html>
