@@ -4,9 +4,14 @@ import '../../styles/global.css';
 import Header from './Header.astro';
 import Footer from './Footer.astro';
 
-// eyecatch を追加。記事ごとに個別の画像パスを渡せるようにする
+const defaultSite = 'https://aktardigrade13-blog.pages.dev';
+
+// Astro.siteが文字列またはURLオブジェクトの場合に備えて、toString()で文字列に変換する
+const siteValue = (Astro.site ?? defaultSite).toString();
+const siteUrl = siteValue.endsWith('/') ? siteValue.slice(0, -1) : siteValue;
 const { title, eyecatch } = Astro.props;
 const defaultEyecatch = '/default-eyecatch.png'; // eyecatch 未指定時のデフォルト画像
+const ogImageUrl = eyecatch ? `${siteUrl}${eyecatch}` : `${siteUrl}${defaultEyecatch}`;
 const fullTitle = title ? `${title} - ${Astro.site}` : Astro.site;
 ---
 <!DOCTYPE html>
@@ -22,12 +27,12 @@ const fullTitle = title ? `${title} - ${Astro.site}` : Astro.site;
         <meta property="og:type" content="website" />
         <meta property="og:url" content={Astro.site} />
         <meta property="og:title" content={fullTitle} />
-        <meta property="og:image" content={eyecatch || defaultEyecatch} />
+        <meta property="og:image" content={ogImageUrl} />
 
         <!-- Twitterカード用metaタグ -->
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={fullTitle} />
-        <meta name="twitter:image" content={eyecatch || defaultEyecatch} />
+        <meta name="twitter:image" content={ogImageUrl} />
 
         <!-- Tailwind CSS のスタイル読み込み -->
         <link rel="stylesheet" href="/src/styles/global.css" />
