@@ -1,7 +1,2 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
-
-/* ブログ記事内のコンテンツ向けスタイル */
-.article-content {
-    @apply prose prose-lg max-w-none;
-}
