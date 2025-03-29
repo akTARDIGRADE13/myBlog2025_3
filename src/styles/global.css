@@ -6,7 +6,7 @@
     --accent-color: #4f46e5; /* アクセントは維持 */
     --bg-hover: linear-gradient(135deg, #f0f0f0, #e0e0e0);
     --padding-x: 1rem;
-    --padding-y: 0.7rem;
+    --padding-y: 2.7rem;
     --radius: calc(0.5rem - 1px);
 }
 
@@ -108,6 +108,9 @@
 
 /* 画像部 */
 .markdown-content .rlc-image-container {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
     grid-column: 2;
     aspect-ratio: 1 / 1;
 }
@@ -119,7 +122,7 @@
 }
 
 .markdown-content .rlc-image-container .rlc-image {
-    object-fit: cover;
+    object-fit: contain;
     width: 100%;
     height: 100%;
     margin: 0;
