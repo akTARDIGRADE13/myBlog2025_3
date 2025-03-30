@@ -12,20 +12,20 @@ const { title, date, updated } = Astro.props;
 ---
 
 <Layout title={title}>
-    <article class="max-w-4xl mx-auto py-8">
+    <article class="max-w-4xl mx-auto py-4 sm:py-8">
         <!-- 記事専用のタイトルと日付部分 -->
-        <div class="mt-5 mb-15 text-center">
-            <h1 class="text-4xl font-bold">{title}</h1>
-            <p class="text-gray-500 mt-2">
-                投稿日：{new Date(date).toLocaleDateString('ja-JP')}
-                {updated && updated !== date ? (
-                <>（最終更新日：{new Date(updated).toLocaleDateString('ja-JP')}）</>
-                ) : null}
-            </p>
+        <div class="mt-5 mb-8 text-center">
+        <h1 class="text-2xl sm:text-4xl font-bold">{title}</h1>
+        <p class="text-sm sm:text-base text-gray-500 mt-2">
+            投稿日：{new Date(date).toLocaleDateString('ja-JP')}
+            {updated && updated !== date ? (
+            <>（最終更新日：{new Date(updated).toLocaleDateString('ja-JP')}）</>
+            ) : null}
+        </p>
         </div>
         <!-- 記事本文 -->
-        <div class="prose prose-lg max-w-none markdown-content">
-            <slot />
+        <div class="prose prose-sm sm:prose-lg max-w-none markdown-content">
+        <slot />
         </div>
     </article>
 </Layout>
