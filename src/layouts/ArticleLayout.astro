@@ -6,12 +6,13 @@ export interface Props {
     title: string;
     date: string;
     updated?: string;
+    eyecatch?: string;
 }
 
-const { title, date, updated } = Astro.props;
+const { title, date, updated, eyecatch } = Astro.props;
 ---
 
-<Layout title={title}>
+<Layout title={title} eyecatch={eyecatch}>
     <article class="max-w-4xl mx-auto py-4 sm:py-8">
         <!-- 記事専用のタイトルと日付部分 -->
         <div class="mt-5 mb-8 text-center">
