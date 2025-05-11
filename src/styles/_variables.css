@@ -1,0 +1,102 @@
+:root {
+    /*---------- Colors ----------*/
+    --color-text-primary: #4a4a4a;             /* 本文テキスト色 */
+    --color-text-secondary: #737373;           /* 補助テキスト色 */
+    --color-text-em: #4a4a4a;                     /* 斜体テキスト色 */
+    --color-text-strong: #1d1d1d;                    /* 太字テキスト色 */
+    --color-text-strong-bg: #e8ff1b;             /* 太字テキスト色（ボーダー） */
+    --color-link: #6d65ff;                     /* リンク色 */
+    --color-link-hover: #4f46b6;               /* リンクホバー色 */
+    --color-url: #525252;                      /* URLテキスト色 */
+    --color-url-dark: #d4d4d4;                 /* URL色（ダークモード） */
+    --color-desc-dark: #a3a3a3;                /* 説明文色（ダークモード） */
+
+    --color-heading-h1: #222;                /* 見出し1テキスト色 */
+    --color-heading-h1-strong: #00cf9f;         /* 見出し1強調テキスト色 */
+    --color-heading-h2: #333;                  /* 見出し2テキスト色 */
+    --color-heading-h3: #444;                  /* 見出し3テキスト色 */
+    --color-heading-h4: #555;                  /* 見出し4テキスト色 */
+    --color-heading-h5: #666;                  /* 見出し5テキスト色 */
+    --color-heading-h6: #777;                  /* 見出し6テキスト色 */
+
+    --color-blockquote-bg: #f5f5f5;             /* 引用背景色 */
+    --color-blockquote-border: #9dd4ff;         /* 引用ボーダー色 */
+
+    --color-code-text: #009e71;                    /* コードテキスト色 */
+    --color-code-bg: #f5f5f5;                   /* コードブロック背景色 */
+
+    --color-list: #1e366a;                     /* リスト色 */
+
+    --color-h1-border: skyblue;                /* H1の一次境界線色 */
+    --color-h1-after-border: #ffc778;          /* H1の下線装飾色 */
+
+    /*---------- H1 Decoration Variables ----------*/
+    --color-h1-triangle: rgb(0, 79, 111);    /* H1左三角形の色 */
+    --h1-triangle-width: 15px;                  /* H1三角形の横幅 */
+    --h1-triangle-height: 15px;                 /* H1三角形の高さ */
+    --color-h1-underline: rgb(0, 79, 111);   /* H1下線の色 */
+    --h1-underline-height: 5px;                 /* H1下線の太さ */
+    --h1-underline-offset: 10px;                /* H1下線の左オフセット */
+
+    /*---------- H3 Decoration Variables ----------*/
+    --color-h3-bg: #77c3df;                     /* H3背景色 */
+    --color-h3-corner: #fff;                    /* H3コーナー三角形の色 */
+    --h3-corner-width: 40px;                    /* H3コーナー三角形の横幅 */
+    --h3-corner-height: 79px;                   /* H3コーナー三角形の高さ */
+    --h3-padding-vertical: 5px;                 /* H3上下パディング */
+    --h3-padding-horizontal: 5px;               /* H3左右パディング（右も兼用） */
+    --h3-padding-left: 42px;                    /* H3左パディング */
+    --h3-margin-left: -33px;                    /* H3左マージン */
+
+    /*---------- Spacing ----------*/
+    --spacing-padding-x: 1rem;                 /* コンテンツ内横パディング */
+    --spacing-padding-y: 2.7rem;               /* コンテンツ内縦パディング */
+    --spacing-paragraph: 1.5em;                /* 段落間マージン */
+    --spacing-br: 1em;                         /* 改行後マージン */
+    --spacing-list-vertical: 1em;              /* リスト上下マージン */
+    --spacing-list-padding: 0.2em;             /* リスト内パディング */
+    --spacing-list-gap: 0.5rem;                /* URLコンテナ内ギャップ */
+
+    /*---------- Typography ----------*/
+    --font-size-base: 1.125rem;                /* 基本文字サイズ */
+    --font-size-base-small: 1rem;             /* 基本文字サイズ（小） */
+    --font-size-mobile: 0.89rem;               /* 小画面文字サイズ */
+    --line-height-base: 1.8;                   /* 基本行送り */
+    --line-height-mobile: 1.7;                 /* 小画面行送り */
+    --font-size-code-inline: 0.875rem;         /* インラインコード文字サイズ */
+    --font-size-code-block: 0.875rem;          /* コードブロック文字サイズ */
+    --font-size-quote-mark: 70px;              /* 引用マークサイズ */
+    --font-size-quote-mark-mobile: 50px;       /* 引用マークサイズ（小画面） */
+
+    /*---------- Heading sizes (desktop) ----------*/
+    --font-size-h1: 2.00rem;
+    --font-size-h1-strong: 2.5rem;             /* H1強調サイズ */
+    --font-size-h2: 1.875rem;
+    --font-size-h3: 1.5rem;
+    --font-size-h4: 1.25rem;
+    --font-size-h5: 1.125rem;
+    --font-size-h6: 1rem;
+
+    /*---------- Heading sizes (mobile fallback) ----------*/
+    --font-size-h1-mobile: 1.6rem;
+    --font-size-h1-strong-mobile: 2.0rem;      /* H1強調サイズ（小画面） */
+    --font-size-h2-mobile: 1.5rem;
+    --font-size-h3-mobile: 1.25rem;
+    --font-size-h4-mobile: 1.125rem;
+    --font-size-h5-mobile: 1rem;
+    --font-size-h6-mobile: 0.9rem;
+
+    /*---------- Borders & Radius ----------*/
+    --radius-base: 0.5rem;                     /* 基本ボーダー半径 */
+    --radius-offset: 1px;                      /* 半径オフセット */
+    --radius-standard: calc(var(--radius-base) - var(--radius-offset)); /* 実際の半径 */
+    --border-width-card: 1.7px;                /* カード境界線太さ */
+
+    /*---------- Link Card Grid ----------*/
+    --grid-gap: 0;                             /* グリッド間隔 */
+    --thumbnail-width: 116px;                  /* サムネイル幅 */
+    --thumbnail-width-wide: 220px;             /* サムネイル幅（大画面） */
+
+    /*---------- Shadows ----------*/
+    --shadow-code-block: inset 0 2px 4px rgba(0,0,0,0.2);
+}
