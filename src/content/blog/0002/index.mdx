@@ -1,0 +1,119 @@
+---
+id: "2"
+title: "Maxwell-Boltzmann分布に従う粒子の相対速度"
+date: "2025-05-11"
+updated: "2025-05-11"
+eyecatch: "/blog/0002/eyecatch.png"
+tags: ["物理", "熱力学"]
+---
+
+# この記事で示すこと
+
+- 2つの粒子がそれぞれMaxwell-Boltzmann分布に従って運動しているとき、その相対速度もまたMaxwell-Boltzmann分布に従うことを示す
+
+# モチベーション
+
+　二つの原子核が衝突して核反応を起こすとき、その反応の確率は相対速度に依存する。また、恒星内は局所的熱力学平衡状態にあると仮定すると、原子核の運動はMaxwell-Boltzmann分布に従う。
+
+　星の進化を考える上で**核反応による組成変化**は重要な要素であり、相対速度はその反応確率に影響を与えるため、相対速度分布を知ることは重要である。
+
+　[ゼミで使っている教科書](https://www.amazon.co.jp/Introduction-Theory-Stellar-Structure-Evolution/dp/0521866049)にはサラッと「相対速度もMaxwell-Boltzmann分布に従う」と書いてあったが、特に証明はされていなかったので、実際に計算してみることにした。
+
+# 計算
+
+　質量 $m_1$ の粒子1の速度分布は
+
+$$
+f_1(\vb{v}) \dd{\vb{v}} = \pqty{\frac{m_1}{2\pi k T}}^{3/2} \exp \pqty{\frac{-m_1v^2}{2 k T}} \dd{\vb{v}},
+$$
+
+質量 $m_2$ の粒子2の速度分布は
+
+$$
+f_2(\vb{v}) \dd{\vb{v}} = \pqty{\frac{m_2}{2\pi k T}}^{3/2} \exp \pqty{\frac{-m_2v^2}{2 k T}} \dd{\vb{v}},
+$$
+
+であるとする。
+
+　粒子1が速度 $\vb{v}_1$ 、粒子2が速度 $\vb{v}_2$ をとる同時確率密度は、各粒子が独立に運動していることから
+
+$$
+\begin{align}
+f_1(\vb{v}_1) f_2(\vb{v}_2) \dd{\vb{v}_1} \dd{\vb{v}_2} = \pqty{\frac{m_1}{2\pi k T}}^{3/2} \pqty{\frac{m_2}{2\pi k T}}^{3/2} \exp \pqty{\frac{-m_1v_1^2}{2 k T}} \exp \pqty{\frac{-m_2v_2^2}{2 k T}} \dd{\vb{v}_1} \dd{\vb{v}_2}.
+\end{align}
+$$
+
+　ここで、重心速度 $\vb{V} \equiv \frac{m_1 \vb{v}_1 + m_2 \vb{v}_2}{m_1 + m_2}$ と相対速度 $\vb{u} \equiv \vb{v}_1 - \vb{v}_2$ を導入すると
+
+$$
+\begin{align}
+\vb{v}_1 &= \vb{V} + \frac{m_2}{m_1 + m_2} \vb{u}, \\
+\vb{v}_2 &= \vb{V} - \frac{m_1}{m_1 + m_2} \vb{u},
+\end{align}
+$$
+
+と表せる。
+
+　exponentialの中身を整理すると
+
+$$
+\begin{align}
+m_1 v_1^2 + m_2 v_2^2 &= m_1 \pqty{\vb{V} + \frac{m_2}{m_1 + m_2} \vb{u}}^2 + m_2 \pqty{\vb{V} - \frac{m_1}{m_1 + m_2} \vb{u}}^2 \notag \\ 
+&= \pqty{m_1 + m_2} \vb{V}^2 + \pqty{\frac{m_1 m_2}{m_1 + m_2}} \vb{u}^2 \notag \\
+&= \pqty{m_1 + m_2} \vb{V}^2 + \mu \vb{u}^2.
+\end{align}
+$$
+
+　最後に $\mu \equiv \frac{m_1 m_2}{m_1 + m_2}$ とした。ここで $\mu$ は換算質量である。
+
+　また、座標変換 $(\vb{v}_1, \vb{v}_2) \to (\vb{V}, \vb{u})$ のヤコビアンは
+
+$$
+\begin{align}
+\det \pqty{\frac{\partial (\vb{v}_1, \vb{v}_2)}{\partial (\vb{V}, \vb{u})}} &= \det \begin{pmatrix}
+1 & \frac{m_2}{m_1 + m_2} \\
+1 & -\frac{m_1}{m_1 + m_2}
+\end{pmatrix}  \notag \\
+&= \frac{m_2 + m_1}{m_1 + m_2} = 1.
+\end{align}
+$$
+
+　(2),(3),(4),(5)を用いて、(1)を整理すると
+
+$$
+\begin{align}
+f_1(\vb{v}_1) f_2(\vb{v}_2) \dd{\vb{v}_1} \dd{\vb{v}_2} &= \pqty{\frac{m_1}{2\pi k T}}^{3/2} \pqty{\frac{m_2}{2\pi k T}}^{3/2} \exp \pqty{\frac{-\pqty{m_1 + m_2}\vb{V}^2 - \mu \vb{u}^2}{2 k T}} \dd{\vb{V}} \dd{\vb{u}} \\ 
+&= f_V(\vb{V}) f_u(\vb{u}) \dd{\vb{V}} \dd{\vb{u}} \notag.
+\end{align}
+$$
+
+　ここで、$f_V(\vb{V})$ は重心速度の分布、$f_u(\vb{u})$ は相対速度の分布である。同時確率密度関数が規格化されているので、$f_V(\vb{V})$ と $f_u(\vb{u})$ も規格化されているとしてよい。
+
+　(6)式を $\vb{V}$ について積分すると
+
+$$
+\begin{align}
+\int f_1(\vb{v}_1) f_2(\vb{v}_2) \dd{\vb{V}} &= f_u(\vb{u}) \dd{\vb{u}} \int f_V(\vb{V}) \dd{\vb{V}} \notag \\
+&= f_u(\vb{u}) \dd{\vb{u}} \notag \\
+&= \pqty{\frac{m_1}{2\pi k T}}^{3/2} \pqty{\frac{m_2}{2\pi k T}}^{3/2} \int_0^\infty \exp \pqty{\frac{-(m_1 + m_2) V^2 - \mu \vb{u}^2}{2 k T}} 4 \pi V^2 \dd{V} \dd{\vb{u}} \notag \\
+&= \pqty{\frac{m_1}{2\pi k T}}^{3/2} \pqty{\frac{m_2}{2\pi k T}}^{3/2} \exp \pqty{\frac{-\mu \vb{u}^2}{2 k T}}  \dd{\vb{u}} \int_0^\infty \exp \pqty{\frac{-(m_1 + m_2) V^2}{2 k T}} 4 \pi V^2 \dd{V} \notag \\
+&= \pqty{\frac{m_1}{2\pi k T}}^{3/2} \pqty{\frac{m_2}{2\pi k T}}^{3/2} \exp \pqty{\frac{-\mu \vb{u}^2}{2 k T}}  \dd{\vb{u}} \qty{4 \pi \frac{1}{4} \pqty{\frac{2 k T}{m_1 + m_2}}^{3/2} \sqrt{\pi}} \notag \\
+&= \pqty{\frac{\mu}{2\pi k T}}^{3/2} \exp \pqty{\frac{-\mu \vb{u}^2}{2 k T}}  \dd{\vb{u}} 
+\end{align}
+$$ 
+
+となる。よって、相対速度の分布は
+
+$$
+f_u(\vb{u}) = \pqty{\frac{\mu}{2\pi k T}}^{3/2} \exp \pqty{\frac{-\mu \vb{u}^2}{2 k T}}.
+$$
+
+　これは質量を換算質量 $\mu$ としたときのMaxwell-Boltzmann分布そのものである。
+
+　ついでに、重心速度の分布は
+
+$$
+f_V(\vb{V}) = \pqty{\frac{m_1 + m_2}{2\pi k T}}^{3/2} \exp \pqty{\frac{-(m_1 + m_2) V^2}{2 k T}},
+$$
+
+となり、こちらも質量を $m_1 + m_2$ としたときのMaxwell-Boltzmann分布である。
