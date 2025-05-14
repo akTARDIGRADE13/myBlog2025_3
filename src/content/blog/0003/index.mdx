@@ -95,7 +95,18 @@ $$
 
 ## 導出
 
-　と置く。 $x_0$ の近傍で $f(x), \ g(x)$ をテイラー展開すると、 
+　関数 $f \in C^2([a, b])$ と $g \in C([a, b])$ があり、 $f$ は
+
+$$
+\begin{aligned}
+f(x_0) &> f(x) \quad (x \in [a, b],\  x \ne x_0) , \\
+f''(x_0) &< 0
+\end{aligned}
+$$
+
+を満たすとする。このとき、(1)式が成り立つことを示す。
+
+　$x_0$ の近傍で $f(x), \ g(x)$ をテイラー展開すると、 
 
 $$
 \begin{aligned}
@@ -104,26 +115,80 @@ g(x) &= g(x_0) + o(1) \quad (x \to x_0).
 \end{aligned}
 $$
 
-すなわち、任意の正数 $\epsilon$ に対して、 ある $\delta_1, \delta_2$ が存在して、 
+すなわち、任意の正数 $\epsilon$ に対して、 ある $\delta_1 > 0, \delta_2 > 0$ が存在して、 
 
 $$
 \begin{aligned}
-\abs{f(x) - f(x_0) - \frac{1}{2} f''(x_0) (x-x_0)^2} < \epsilon (x-x_0)^2 \quad (\abs{x-x_0} < \delta_1), \\
-\abs{g(x) - g(x_0)} < \epsilon \quad (\abs{x-x_0} < \delta_2).
+\abs{f(x) - f(x_0) - \frac{1}{2} f''(x_0) (x-x_0)^2} < \epsilon (x-x_0)^2 \quad (\abs{x-x_0} \le \delta_1), \\
+\abs{g(x) - g(x_0)} < \epsilon \quad (\abs{x-x_0} \le \delta_2).
 \end{aligned}
 $$
 
 $\delta = \min(\delta_1, \delta_2)$ とすると、 
 
 $$
+\int_a^b e^{\lambda f(x)} g(x) \dd{x} = \int_{x_0 - \delta}^{x_0 + \delta} e^{\lambda f(x)} g(x) \dd{x} + \int_{\abs{x-x_0} \ge \delta} e^{\lambda f(x)} g(x) \dd{x} \equiv I_{in} + I_{out}.
+$$
+
+　$I_{in}$ は $x = x_0 + t / \sqrt{\lambda}$ と置換すると、
+
+$$
 \begin{aligned}
-&\quad \int_{x_0 - \delta}^{x_0 + \delta} \exp \qty{\lambda \pqty{f(x_0) + \frac{1}{2} (f''(x_0) \pm \epsilon) (x-x_0)^2}} \pqty{g(x_0) \pm \epsilon} \dd{x} \\
+I_{in} &= \int_{x_0 - \delta}^{x_0 + \delta} \exp \qty{\lambda \pqty{f(x_0) + \frac{1}{2} (f''(x_0) \pm \epsilon) (x-x_0)^2}} \pqty{g(x_0) \pm \epsilon} \dd{x} \\
 &= \exp \qty{\lambda f(x_0)} \pqty{g(x_0) \pm \epsilon} \int_{x_0 - \delta}^{x_0 + \delta} \exp \qty{\lambda \pqty{\frac{1}{2} (f''(x_0) \pm \epsilon) (x-x_0)^2}} \dd{x} \\
+&= \frac{\exp \qty{\lambda f(x_0)}}{\sqrt{\lambda}} \pqty{g(x_0) \pm \epsilon} \int_{-\delta \sqrt{\lambda}}^{\delta \sqrt{\lambda}} \exp \qty{\frac{1}{2} (f''(x_0) \pm \epsilon) t^2} \dd{t}.
 \end{aligned}
 $$
 
+$\epsilon$ を $0 < \epsilon < -f''(x_0)$ の範囲で取ることにすると、
 
+$$
+\begin{align}
+e^{-\lambda f(x_0)} \sqrt{\lambda} I_{in} &= \pqty{g(x_0) \pm \epsilon} \int_{-\delta \sqrt{\lambda}}^{\delta \sqrt{\lambda}} \exp \qty{\frac{1}{2} (f''(x_0) \pm \epsilon) t^2} \dd{t} \notag \\
+&\to \pqty{g(x_0) \pm \epsilon} \sqrt{\frac{2\pi}{\abs{f''(x_0) \pm \epsilon}}} \quad (\lambda \to \infty).
+\end{align}
+$$
 
+　$I_{out}$ は、 $x_0$ が唯一の最大値を取る点であることから、 
+
+$$
+\exist c > 0 \quad \forall x ,\quad \abs{x-x_0} \ge \delta \implies f(x) < f(x_0) - c.
+$$
+
+$A \equiv \abs{\sup_{\abs{x-x_0} \ge \delta} g(x)}$ とすると、 
+
+$$
+\begin{aligned}
+\abs{I_{out}} \le A (b-a) e^{\lambda (f(x_0) - c)}
+\end{aligned}
+$$
+
+と評価できて、
+
+$$
+\begin{align}
+A (b-a) e^{\lambda (f(x_0) - c)} \to 0 \quad (\lambda \to \infty)
+\end{align}
+$$
+
+より、
+
+$$
+\begin{aligned}
+e^{-\lambda f(x_0)} \sqrt{\lambda} I_{out} \to 0 \quad (\lambda \to \infty).
+\end{aligned}
+$$
+
+　$\epsilon$ は $0 < \epsilon < -f''(x_0)$ の範囲で任意に取れるので、 式(3),(4)より、
+
+$$
+\begin{aligned}
+\lim_{\lambda \to \infty} e^{-\lambda f(x_0)} \sqrt{\lambda} \int_a^b e^{\lambda f(x)} g(x) \dd{x} &= g(x_0) \sqrt{\frac{2\pi}{\abs{f''(x_0)}}} \quad (\lambda \to \infty), \\
+\lim_{\lambda \to \infty} e^{-\lambda f(x_0)} \sqrt{\frac{\lambda}{2\pi}} \int_a^b e^{\lambda f(x)} g(x) \dd{x} &= g(x_0) \sqrt{\frac{1}{\abs{f''(x_0)}}} \quad (\lambda \to \infty).
+\end{aligned}
+$$
+
+　よって、(1)式が成り立つことが示された。
 
 
 <br/>
