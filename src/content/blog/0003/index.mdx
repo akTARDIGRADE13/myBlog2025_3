@@ -18,7 +18,9 @@ tags: ["数学"]
 このとき
 
 $$
-\lim_{\lambda \to \infty} e^{\lambda f(x_0)} \sqrt{\frac{\lambda}{2\pi}} \int_a^b e^{\lambda f(x)} g(x) \dd{x} = g(x_0) \sqrt{\frac{1}{\abs{f''(x_0)}}}.
+\begin{align}
+\lim_{\lambda \to \infty} e^{-\lambda f(x_0)} \sqrt{\frac{\lambda}{2\pi}} \int_a^b e^{\lambda f(x)} g(x) \dd{x} = g(x_0) \sqrt{\frac{1}{\abs{f''(x_0)}}}.
+\end{align}
 $$
 
 言い換えると、 $\lambda$ が十分に大きいとき、
@@ -89,9 +91,36 @@ $$
 
 横軸を $x$ でなく $f(x)$ にして考えるとより分かりやすそうで、グラフの横のスケールが変わっていないのに縦のスケールだけが大きくなっているようなイメージができる。
 
-　以下に、「ラプラスの方法」の近似式の導出を示す。
+　以下に、(1)式の導出を示す。
 
 ## 導出
+
+　と置く。 $x_0$ の近傍で $f(x), \ g(x)$ をテイラー展開すると、 
+
+$$
+\begin{aligned}
+f(x) &= f(x_0) + \frac{1}{2} f''(x_0) (x-x_0)^2 + o((x-x_0)^2) \quad (x \to x_0), \\
+g(x) &= g(x_0) + o(1) \quad (x \to x_0).
+\end{aligned}
+$$
+
+すなわち、任意の正数 $\epsilon$ に対して、 ある $\delta_1, \delta_2$ が存在して、 
+
+$$
+\begin{aligned}
+\abs{f(x) - f(x_0) - \frac{1}{2} f''(x_0) (x-x_0)^2} < \epsilon (x-x_0)^2 \quad (\abs{x-x_0} < \delta_1), \\
+\abs{g(x) - g(x_0)} < \epsilon \quad (\abs{x-x_0} < \delta_2).
+\end{aligned}
+$$
+
+$\delta = \min(\delta_1, \delta_2)$ とすると、 
+
+$$
+\begin{aligned}
+&\quad \int_{x_0 - \delta}^{x_0 + \delta} \exp \qty{\lambda \pqty{f(x_0) + \frac{1}{2} (f''(x_0) \pm \epsilon) (x-x_0)^2}} \pqty{g(x_0) \pm \epsilon} \dd{x} \\
+&= \exp \qty{\lambda f(x_0)} \pqty{g(x_0) \pm \epsilon} \int_{x_0 - \delta}^{x_0 + \delta} \exp \qty{\lambda \pqty{\frac{1}{2} (f''(x_0) \pm \epsilon) (x-x_0)^2}} \dd{x} \\
+\end{aligned}
+$$
 
 
 
