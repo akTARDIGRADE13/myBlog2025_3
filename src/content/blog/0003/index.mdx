@@ -1,8 +1,8 @@
 ---
 id: "3"
 title: "ラプラスの方法"
-date: "2025-05-12"
-updated: "2025-05-12"
+date: "2025-05-14"
+updated: "2025-05-14"
 eyecatch: "/blog/0002/eyecatch.png"
 tags: ["数学"]
 ---
@@ -18,14 +18,16 @@ tags: ["数学"]
 このとき
 
 $$
-\lim_{\lambda \to \infty} e^{\lambda f(x_0)} \sqrt{\frac{\lambda}{2\pi}} \int_a^b e^{\lambda f(x)} g(x) \dd{x} = g(x_0) \sqrt{\frac{1}{\abs{f''(x_0)}}}.
+\begin{align}
+\lim_{\lambda \to \infty} e^{-\lambda f(x_0)} \sqrt{\frac{\lambda}{2\pi}} \int_a^b e^{\lambda f(x)} g(x) \dd{x} = g(x_0) \sqrt{\frac{1}{-f''(x_0)}}.
+\end{align}
 $$
 
 言い換えると、 $\lambda$ が十分に大きいとき、
 
 $$
 \begin{align}
-\int_a^b e^{\lambda f(x)} g(x) \dd{x} \sim e^{\lambda f(x_0)} g(x_0) \sqrt{\frac{2\pi}{\lambda \abs{f''(x_0)}}}.
+\int_a^b e^{\lambda f(x)} g(x) \dd{x} \sim e^{\lambda f(x_0)} g(x_0) \sqrt{\frac{2\pi}{-\lambda f''(x_0)}}.
 \end{align}
 $$
 
@@ -89,17 +91,145 @@ $$
 
 横軸を $x$ でなく $f(x)$ にして考えるとより分かりやすそうで、グラフの横のスケールが変わっていないのに縦のスケールだけが大きくなっているようなイメージができる。
 
-　以下に、「ラプラスの方法」の近似式の導出を示す。
+　以下に、(1)式の導出を示す。
 
 ## 導出
 
+　関数 $f \in C^2([a, b])$ と $g \in C([a, b])$ があり、 $f$ は
 
+$$
+\begin{aligned}
+f(x_0) &> f(x) \quad (x \in [a, b],\  x \ne x_0) , \\
+f''(x_0) &< 0
+\end{aligned}
+$$
 
+を満たすとする。このとき、(1)式が成り立つことを示す。
 
+　$x_0$ の近傍で $f(x), \ g(x)$ をテイラー展開すると、 
+
+$$
+\begin{aligned}
+f(x) &= f(x_0) + \frac{1}{2} f''(x_0) (x-x_0)^2 + o((x-x_0)^2) \quad (x \to x_0), \\
+g(x) &= g(x_0) + o(1) \quad (x \to x_0).
+\end{aligned}
+$$
+
+すなわち、任意の正数 $\epsilon$ に対して、 ある $\delta_1 > 0, \delta_2 > 0$ が存在して、 
+
+$$
+\begin{aligned}
+\abs{f(x) - f(x_0) - \frac{1}{2} f''(x_0) (x-x_0)^2} < \epsilon (x-x_0)^2 \quad (\abs{x-x_0} \le \delta_1), \\
+\abs{g(x) - g(x_0)} < \epsilon \quad (\abs{x-x_0} \le \delta_2).
+\end{aligned}
+$$
+
+$\delta = \min(\delta_1, \delta_2)$ とすると、 
+
+$$
+\int_a^b e^{\lambda f(x)} g(x) \dd{x} = \int_{x_0 - \delta}^{x_0 + \delta} e^{\lambda f(x)} g(x) \dd{x} + \int_{\abs{x-x_0} \ge \delta} e^{\lambda f(x)} g(x) \dd{x} \equiv I_{in} + I_{out}.
+$$
+
+　$I_{in}$ は $x = x_0 + t / \sqrt{\lambda}$ と置換すると、
+
+$$
+\begin{aligned}
+I_{in} &= \int_{x_0 - \delta}^{x_0 + \delta} \exp \qty{\lambda \pqty{f(x_0) + \frac{1}{2} (f''(x_0) \pm \epsilon) (x-x_0)^2}} \pqty{g(x_0) \pm \epsilon} \dd{x} \\
+&= \exp \qty{\lambda f(x_0)} \pqty{g(x_0) \pm \epsilon} \int_{x_0 - \delta}^{x_0 + \delta} \exp \qty{\lambda \pqty{\frac{1}{2} (f''(x_0) \pm \epsilon) (x-x_0)^2}} \dd{x} \\
+&= \frac{\exp \qty{\lambda f(x_0)}}{\sqrt{\lambda}} \pqty{g(x_0) \pm \epsilon} \int_{-\delta \sqrt{\lambda}}^{\delta \sqrt{\lambda}} \exp \qty{\frac{1}{2} (f''(x_0) \pm \epsilon) t^2} \dd{t}.
+\end{aligned}
+$$
+
+$\epsilon$ を $0 < \epsilon < -f''(x_0)$ の範囲で取ることにすると、
+
+$$
+\begin{align}
+e^{-\lambda f(x_0)} \sqrt{\lambda} I_{in} &= \pqty{g(x_0) \pm \epsilon} \int_{-\delta \sqrt{\lambda}}^{\delta \sqrt{\lambda}} \exp \qty{\frac{1}{2} (f''(x_0) \pm \epsilon) t^2} \dd{t} \notag \\
+&\to \pqty{g(x_0) \pm \epsilon} \sqrt{\frac{2\pi}{-f''(x_0) \pm \epsilon}} \quad (\lambda \to \infty).
+\end{align}
+$$
+
+　$I_{out}$ は、 $x_0$ が唯一の最大値を取る点であることから、 ある $c > 0$ が存在して、任意の $x : \abs{x-x_0} \ge \delta$ に対して、
+
+$$
+f(x) < f(x_0) - c.
+$$
+
+$A \equiv \abs{\sup_{\abs{x-x_0} \ge \delta} g(x)}$ とすると、 
+
+$$
+\begin{aligned}
+\abs{I_{out}} \le A (b-a) e^{\lambda (f(x_0) - c)}
+\end{aligned}
+$$
+
+と評価できて、
+
+$$
+\begin{align}
+A (b-a) e^{\lambda (f(x_0) - c)} \to 0 \quad (\lambda \to \infty)
+\end{align}
+$$
+
+より、
+
+$$
+\begin{aligned}
+e^{-\lambda f(x_0)} \sqrt{\lambda} I_{out} \to 0 \quad (\lambda \to \infty).
+\end{aligned}
+$$
+
+　$\epsilon$ は $0 < \epsilon < -f''(x_0)$ の範囲で任意に取れるので、 式(3),(4)より、
+
+$$
+\begin{aligned}
+\lim_{\lambda \to \infty} e^{-\lambda f(x_0)} \sqrt{\lambda} \int_a^b e^{\lambda f(x)} g(x) \dd{x} &= g(x_0) \sqrt{\frac{2\pi}{-f''(x_0)}} \quad (\lambda \to \infty), \\
+\lim_{\lambda \to \infty} e^{-\lambda f(x_0)} \sqrt{\frac{\lambda}{2\pi}} \int_a^b e^{\lambda f(x)} g(x) \dd{x} &= g(x_0) \sqrt{\frac{1}{-f''(x_0)}} \quad (\lambda \to \infty).
+\end{aligned}
+$$
+
+　よって、(1)式が成り立つことが示された。
+
+# Stirlingの公式
+
+$$
+n! \sim \sqrt{2\pi n} \pqty{\frac{n}{e}}^n
+$$
+
+をラプラスの方法を使って示すことができる。具体的には、
+
+$$
+\begin{aligned}
+n! &= \Gamma(n+1) \\
+&= \int_0^\infty e^{-t} t^n \dd{t}
+\end{aligned}
+$$
+
+と表し、$x = ny$ と置換すると、
+
+$$
+\begin{aligned}
+\int_0^\infty e^{-t} t^n \dd{t} &= n^{n+1} \int_0^\infty e^{-ny} y^n \dd{y} \\
+&= n^{n+1} \int_0^\infty e^{-n \pqty{\log y - y}} \dd{y}.
+\end{aligned}
+$$
+
+　ここで、 $f(y) = \log y - y, \ g(y) = 1$ とすると、 $f$ は $y = 1$ で最大値を取り、 $f''(1) = -1$ である。したがって、ラプラスの方法が適用できて、
+
+$$
+\begin{aligned}
+n! &\sim n^{n+1} e^{nf(1)} \sqrt{\frac{2\pi}{-nf''(1)}} \\
+&= \sqrt{2\pi n} \pqty{\frac{n}{e}}^n.
+\end{aligned}
+$$
+
+# おわり
+
+　議論の飛躍が無いように注意したつもりだけど、普段の生活の中で数学の話をすることがあまり無いので、穴がありそうで怖い。
+
+　本当は誤差評価（収束スピード）についても議論したかったのだけど、よくわかんなくなってやめちゃった。外側は指数関数的に収束するけど、内側はどうなるのかな。いつかの授業でこういう近似の評価の仕方を聞いた気もするんだけど...。
 
 <br/>
-
----
 
 <br/>
 
