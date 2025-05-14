@@ -1,8 +1,8 @@
 ---
 id: "3"
 title: "ラプラスの方法"
-date: "2025-05-12"
-updated: "2025-05-12"
+date: "2025-05-14"
+updated: "2025-05-14"
 eyecatch: "/blog/0002/eyecatch.png"
 tags: ["数学"]
 ---
@@ -19,7 +19,7 @@ tags: ["数学"]
 
 $$
 \begin{align}
-\lim_{\lambda \to \infty} e^{-\lambda f(x_0)} \sqrt{\frac{\lambda}{2\pi}} \int_a^b e^{\lambda f(x)} g(x) \dd{x} = g(x_0) \sqrt{\frac{1}{\abs{f''(x_0)}}}.
+\lim_{\lambda \to \infty} e^{-\lambda f(x_0)} \sqrt{\frac{\lambda}{2\pi}} \int_a^b e^{\lambda f(x)} g(x) \dd{x} = g(x_0) \sqrt{\frac{1}{-f''(x_0)}}.
 \end{align}
 $$
 
@@ -27,7 +27,7 @@ $$
 
 $$
 \begin{align}
-\int_a^b e^{\lambda f(x)} g(x) \dd{x} \sim e^{\lambda f(x_0)} g(x_0) \sqrt{\frac{2\pi}{\lambda \abs{f''(x_0)}}}.
+\int_a^b e^{\lambda f(x)} g(x) \dd{x} \sim e^{\lambda f(x_0)} g(x_0) \sqrt{\frac{2\pi}{-\lambda f''(x_0)}}.
 \end{align}
 $$
 
@@ -145,14 +145,14 @@ $\epsilon$ を $0 < \epsilon < -f''(x_0)$ の範囲で取ることにすると�
 $$
 \begin{align}
 e^{-\lambda f(x_0)} \sqrt{\lambda} I_{in} &= \pqty{g(x_0) \pm \epsilon} \int_{-\delta \sqrt{\lambda}}^{\delta \sqrt{\lambda}} \exp \qty{\frac{1}{2} (f''(x_0) \pm \epsilon) t^2} \dd{t} \notag \\
-&\to \pqty{g(x_0) \pm \epsilon} \sqrt{\frac{2\pi}{\abs{f''(x_0) \pm \epsilon}}} \quad (\lambda \to \infty).
+&\to \pqty{g(x_0) \pm \epsilon} \sqrt{\frac{2\pi}{-f''(x_0) \pm \epsilon}} \quad (\lambda \to \infty).
 \end{align}
 $$
 
-　$I_{out}$ は、 $x_0$ が唯一の最大値を取る点であることから、 
+　$I_{out}$ は、 $x_0$ が唯一の最大値を取る点であることから、 ある $c > 0$ が存在して、任意の $x : \abs{x-x_0} \ge \delta$ に対して、
 
 $$
-\exist c > 0 \quad \forall x ,\quad \abs{x-x_0} \ge \delta \implies f(x) < f(x_0) - c.
+f(x) < f(x_0) - c.
 $$
 
 $A \equiv \abs{\sup_{\abs{x-x_0} \ge \delta} g(x)}$ とすると、 
@@ -183,17 +183,53 @@ $$
 
 $$
 \begin{aligned}
-\lim_{\lambda \to \infty} e^{-\lambda f(x_0)} \sqrt{\lambda} \int_a^b e^{\lambda f(x)} g(x) \dd{x} &= g(x_0) \sqrt{\frac{2\pi}{\abs{f''(x_0)}}} \quad (\lambda \to \infty), \\
-\lim_{\lambda \to \infty} e^{-\lambda f(x_0)} \sqrt{\frac{\lambda}{2\pi}} \int_a^b e^{\lambda f(x)} g(x) \dd{x} &= g(x_0) \sqrt{\frac{1}{\abs{f''(x_0)}}} \quad (\lambda \to \infty).
+\lim_{\lambda \to \infty} e^{-\lambda f(x_0)} \sqrt{\lambda} \int_a^b e^{\lambda f(x)} g(x) \dd{x} &= g(x_0) \sqrt{\frac{2\pi}{-f''(x_0)}} \quad (\lambda \to \infty), \\
+\lim_{\lambda \to \infty} e^{-\lambda f(x_0)} \sqrt{\frac{\lambda}{2\pi}} \int_a^b e^{\lambda f(x)} g(x) \dd{x} &= g(x_0) \sqrt{\frac{1}{-f''(x_0)}} \quad (\lambda \to \infty).
 \end{aligned}
 $$
 
 　よって、(1)式が成り立つことが示された。
 
+# Stirlingの公式
+
+$$
+n! \sim \sqrt{2\pi n} \pqty{\frac{n}{e}}^n
+$$
+
+をラプラスの方法を使って示すことができる。具体的には、
+
+$$
+\begin{aligned}
+n! &= \Gamma(n+1) \\
+&= \int_0^\infty e^{-t} t^n \dd{t}
+\end{aligned}
+$$
+
+と表し、$x = ny$ と置換すると、
+
+$$
+\begin{aligned}
+\int_0^\infty e^{-t} t^n \dd{t} &= n^{n+1} \int_0^\infty e^{-ny} y^n \dd{y} \\
+&= n^{n+1} \int_0^\infty e^{-n \pqty{\log y - y}} \dd{y}.
+\end{aligned}
+$$
+
+　ここで、 $f(y) = \log y - y, \ g(y) = 1$ とすると、 $f$ は $y = 1$ で最大値を取り、 $f''(1) = -1$ である。したがって、ラプラスの方法が適用できて、
+
+$$
+\begin{aligned}
+n! &\sim n^{n+1} e^{nf(1)} \sqrt{\frac{2\pi}{-nf''(1)}} \\
+&= \sqrt{2\pi n} \pqty{\frac{n}{e}}^n.
+\end{aligned}
+$$
+
+# おわり
+
+　議論の飛躍が無いように注意したつもりだけど、普段の生活の中で数学の話をすることがあまり無いので、穴がありそうで怖い。
+
+　本当は誤差評価（収束スピード）についても議論したかったのだけど、よくわかんなくなってやめちゃった。外側は指数関数的に収束するけど、内側はどうなるのかな。いつかの授業でこういう近似の評価の仕方を聞いた気もするんだけど...。
 
 <br/>
-
----
 
 <br/>
 
