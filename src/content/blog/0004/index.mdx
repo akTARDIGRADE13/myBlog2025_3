@@ -1,0 +1,153 @@
+---
+id: "4"
+title: "マイヤーの関係"
+date: "2025-05-26"
+updated: "2025-05-26"
+eyecatch: "/blog/0004/eyecatch.png"
+tags: ["物理", "熱力学"]
+---
+
+## この記事で示すこと
+
+　マイヤーの関係を導出する。導出自体は2年生の頃に何回もやっているはずなんだけど、この前改めてやろうとしたら忘れていたので、式変形のモチベーションも含めて一度きちんと言語化しておく。
+
+　テストのために詰め込んだだけだから忘れるんだよ。ひどいひどい。
+
+## 導出
+
+　熱力学第一法則
+
+$$
+\begin{align}
+\dd{U} = \dp{Q} + \dp{W},
+\end{align}
+$$
+
+平衡熱力学の基本式
+
+$$
+\begin{align}
+\dd{U} = T \dd{S} - P \dd{V},
+\end{align}
+$$
+
+理想気体の状態方程式
+$$
+\begin{align}
+PV = nRT,
+\end{align}
+$$
+
+は既知とする。
+
+　定積モル比熱 $C_V$ は「**体積一定のときに1モルの物質の温度を1K上昇させるために必要な熱量**」、定圧モル比熱 $C_P$ は「**圧力一定のときに1モルの物質の温度を1K上昇させるために必要な熱量**」である。これを式で表すと、
+
+$$
+\begin{aligned}
+C_V &\equiv \frac{1}{n}\pqty{\frac{\dp{Q}}{\dd{T}}}_{V} \\
+C_P &\equiv \frac{1}{n}\pqty{\frac{\dp{Q}}{\dd{T}}}_{P}.
+\end{aligned}
+$$
+
+また、体積一定のとき、熱力学第一法則より $\dd{U} = \dp{Q}$ であるから、
+
+$$
+C_V = \frac{1}{n}\pqty{\frac{\dd{U}}{\dd{T}}}_{V}.
+$$
+
+　ここから $C_V$ と $C_P$ の関係を導出したい。 $C_V$ の方は $\dp{Q}$ を使わない綺麗な式で書けているので、$C_P$ の式変形を進めていきたい気持ちになる。
+
+　$\dp{Q} = T \dd{S}$ を代入しても新しい文字がでてくるだけなので、熱力学第一法則を使っていこう。
+
+$$
+\begin{aligned}
+\dp{Q} &= \dd{U} - \dp{W} \\
+&= \dd{U} + P \dd{V}.
+\end{aligned}
+$$
+
+　上式を $\dd{T}$ と $n$ で割って圧力一定の条件を課すと、左辺は定圧モル比熱 $C_P$ になる。あとは右辺に $C_V$ が出てくれば良い。 $C_V$ の式を思い出すと、 $U$ の独立変数を $(T, V)$ とすれば、[^1]
+
+$$
+\begin{aligned}
+\dd{U} &= \pqty{\pdv{U}{T}}_{V} \dd{T} + \pqty{\pdv{U}{V}}_{T} \dd{V} \\
+&= C_V \dd{T} + \pqty{\pdv{U}{V}}_{T} \dd{V}.
+\end{aligned}
+$$
+
+これで右辺に $C_V$ が出てきた。 まとめると、
+
+$$
+\begin{align}
+C_P = C_V + \frac{1}{n}\qty{\pqty{\pdv{U}{V}}_{T} + P} \dd{V}. 
+\end{align}
+$$
+
+　あとは $\pqty{\pdv{U}{V}}_{T}$ を消せれば（ $U$ を含まない形に出来れば）良い。[^2]
+
+　偏微分係数を消したり置き換えたりしたいときは、**Maxwellの関係式**を使うのが相場だろう。
+
+$$
+\begin{aligned}
+\dd{U} &= \pqty{\pdv{U}{T}}_{V} \dd{T} + \pqty{\pdv{U}{V}}_{T} \dd{V} \\
+\dd{S} &= \pqty{\pdv{S}{T}}_{V} \dd{T} + \pqty{\pdv{S}{V}}_{T} \dd{V}.
+\end{aligned}
+$$
+
+これらを(2)式に代入して係数を比較すると、
+
+$$
+\begin{aligned}
+\pqty{\pdv{U}{T}}_{V} &= T \pqty{\pdv{S}{T}}_{V} \\
+\pqty{\pdv{U}{V}}_{T} &= T \pqty{\pdv{S}{V}}_{T} - P.
+\end{aligned}
+$$
+
+さらに、$\frac{\partial^2 U}{\partial T \partial V} = \frac{\partial^2 U}{\partial V \partial T}$ であるから、
+
+$$
+\begin{aligned}
+\pdv{}{V} \pqty{\pdv{U}{T}}_{V} &= \pdv{}{T} \pqty{\pdv{U}{V}}_{T} \\
+\pdv{}{V} \pqty{T \pdv{S}{T}} &= \pdv{}{T} \pqty{T \pdv{S}{V} - P} \\
+T \frac{\partial^2 S}{\partial V \partial T} &= T \frac{\partial^2 S}{\partial T \partial V} + \pdv{S}{V} - \pdv{P}{T} \\
+\pqty{\pdv{S}{V}}_{T} &= \pqty{\pdv{P}{T}}_{V} .
+\end{aligned}
+$$
+
+したがって、
+
+$$
+\pqty{\pdv{U}{V}}_{T} = T \pqty{\pdv{P}{T}}_{V} - P.
+$$
+
+　これを(4)式に代入すると、
+
+$$
+\begin{align}
+C_P = C_V + \frac{T}{n} \pqty{\pdv{P}{T}}_{V} \pqty{\pdv{V}{T}}_{P}.
+\end{align}
+$$
+
+　あとは状態方程式から
+
+$$
+\begin{aligned}
+\pqty{\pdv{P}{T}}_{V} &= \frac{nR}{V} \\
+\pqty{\pdv{V}{T}}_{P} &= \frac{nR}{P}
+\end{aligned}
+$$
+
+を代入して、最終的にマイヤーの関係
+
+$$
+C_P = C_V + R
+$$
+
+が得られる。なお、(5)式までは理想気体に限らず成り立つことに注意。
+
+## おわり
+
+　一つ一つの操作の意味やモチベーションをちゃんと言語化しようね（自戒）。
+
+[^1]: 独立変数に $V$ を選ぶのは、代入したい式に $P \dd{V}$ が含まれているから。
+[^2]: 前提として「理想気体の内部エネルギーは温度にのみ依存して体積には依存しない」と言われていれば、ここで試合終了（黄色い本の例題）。
