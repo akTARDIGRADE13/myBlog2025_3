@@ -89,6 +89,8 @@ const katexMacros = {
     "\\differential": "{\\text{d}}",
     "\\dd": "{\\text{d}}",
     "\\d": "{\\text{d}}",
+    "\\dp": "{\\text{d}^\\prime}",
+    "\\dn": "{\\text{d}^{ #1 }}",
     "\\derivative": "{\\frac{\\text{d}{ #1 }}{\\text{d}{ #2 }}}",
     "\\dv": "{\\frac{\\text{d}{ #1 }}{\\text{d}{ #2 }}}",
     "\\partialderivative": "{\\frac{\\partial{ #1 }}{\\partial{ #2 }}}",
