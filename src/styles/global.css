@@ -27,6 +27,7 @@
 
 /* Paragraphs & Line Breaks */
 .markdown-content p {
+    margin-top: var(--spacing-paragraph);
     margin-bottom: var(--spacing-paragraph);
 }
 .markdown-content br {
