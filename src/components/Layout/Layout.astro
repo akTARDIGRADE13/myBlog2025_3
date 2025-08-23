@@ -23,10 +23,17 @@ const toAbs = (p?: string) => (p ? new URL(p, siteUrl).toString() : undefined);
 // 1) string 指定ならその文字列を絶対化
 // 2) ImageMetadata 指定なら .src を絶対化
 // 3) 未指定ならデフォルト ImageMetadata の .src を絶対化
-const ogImageUrl =
-    typeof eyecatch === 'string'
-        ? toAbs(eyecatch)!
-        : toAbs((eyecatch ?? defaultEyecatchMeta).src)!;
+let ogImageUrl: string | undefined;
+
+if (typeof eyecatch === 'string') {
+    // 文字列（相対/絶対パス）。空文字や空白のみは未指定扱い。
+    ogImageUrl = toAbs(eyecatch);
+} else if (eyecatch && typeof eyecatch === 'object' && 'src' in eyecatch) {
+    // ImageMetadata
+    ogImageUrl = toAbs(eyecatch.src);
+}
+
+ogImageUrl = ogImageUrl ?? toAbs(defaultEyecatchMeta.src)!;
 
 const fullTitle = title ? `${title} - ${siteUrl}` : siteUrl;
 ---
