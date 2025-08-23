@@ -11,6 +11,8 @@ import mdx from "@astrojs/mdx";
 import tailwindcss from "@tailwindcss/vite";
 import { getOrigQueryParams } from "astro/assets/utils";
 
+import sitemap from "@astrojs/sitemap";
+
 const katexMacros = {
     "\\quantity": "{\\left\\{ #1 \\right\\}}",
     "\\qty": "{\\left\\{ #1 \\right\\}}",
@@ -132,9 +134,7 @@ const katexMacros = {
 // https://astro.build/config
 export default defineConfig({
     site: "https://aktardigrade13-blog.pages.dev",
-    integrations: [
-        mdx(),
-    ],
+    integrations: [mdx(), sitemap()],
     vite: {
         plugins: [tailwindcss()],
         // windows 側にディレクトリを置いているとき、hot reload が効かないので、以下の設定を追加する
