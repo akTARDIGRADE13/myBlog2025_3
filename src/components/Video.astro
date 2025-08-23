@@ -1,0 +1,53 @@
+---
+type MaybeUrl = string | { src: string };
+
+type VideoSource = { src: MaybeUrl; type?: string };
+type VideoTrack  = {
+    src: MaybeUrl; kind?: string; srclang?: string; label?: string; default?: boolean;
+};
+
+type Props = {
+    src?: MaybeUrl;
+    sources?: VideoSource[];
+
+    tracks?: VideoTrack[];
+    caption?: string;
+    figureClass?: string;
+
+    [key: string]: any;
+};
+
+const {
+    caption,
+    figureClass,
+    src,
+    sources = [],
+    tracks = [],
+    ...rest
+} = Astro.props as Props;
+
+const toUrl = (v: MaybeUrl | undefined) =>
+    typeof v === "string" ? v : (v?.src ?? undefined);
+
+const resolvedSrc = toUrl(src);
+const resolvedSources = sources.map(({ src, type }) => ({ src: toUrl(src), type }));
+const resolvedTracks  = tracks.map(({ src, ...t }) => ({ src: toUrl(src), ...t }));
+---
+
+<figure class={figureClass}>
+    <video
+        class:list={["block mx-auto", rest.class]} 
+        {...{ ...rest, class: undefined }} 
+        src={resolvedSrc}
+    >
+        {resolvedSources.map(({ src, type }) => src && <source src={src} type={type} />)}
+        {resolvedTracks.map(({ src, kind, srclang, label, default: def }) =>
+            src && <track src={src} kind={kind} srclang={srclang} label={label} default={def} />
+        )}
+        お使いのブラウザは動画に対応していません
+    </video>
+
+    {caption && (
+        <figcaption class="text-center text-gray-500 mt-2">{caption}</figcaption>
+    )}
+</figure>
