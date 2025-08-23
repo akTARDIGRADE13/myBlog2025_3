@@ -10,7 +10,6 @@ tags: ["サイト運用", "astro"]
 import { YouTube } from "@astro-community/astro-embed-youtube";
 import Figure from "../../../components/Figure.astro";
 import books from './books.jpg';
-import Gif from "../../../components/Gif.astro";
 import graph from './ex1.gif';
 import Video from "../../../components/Video.astro";
 import Lchika from './Lchika.mp4';
@@ -103,71 +102,15 @@ import books from './books.jpg'
     class="max-w-xl"
 />
 
-gif、動画も同じ要領でやる。
-
 ## gif
 
-```astro
----
-import type { ImageMetadata } from "astro";
-
-type SrcLike = string | URL | { src: string } | ImageMetadata;
-
-type Props = {
-    src: SrcLike;
-    alt: string;
-    caption?: string;
-    figureClass?: string;
-    // width, height, loading, decoding, class など任意
-    [key: string]: any;
-};
-
-const { caption, figureClass, src, alt, ...rest } = Astro.props as Props;
-
-// 文字列URLへ正規化
-const toUrl = (v: SrcLike): string =>
-    typeof v === "string"
-        ? v
-        : v instanceof URL
-        ? v.toString()
-        : "src" in v
-        ? v.src
-        : "";
-
-// class 上書きを避ける（rest.class は別処理）
-const userClass = (rest as any).class as string | undefined;
-delete (rest as any).class;
-
-const resolvedSrc = toUrl(src);
----
-
-{resolvedSrc ? (
-    <figure class={figureClass}>
-        <img
-            src={resolvedSrc}
-            alt={alt}
-            loading={rest.loading ?? "lazy"}
-            decoding={rest.decoding ?? "async"}
-            class:list={["block mx-auto", userClass]}
-            {...rest}
-        />
-        {caption && (
-            <figcaption class="text-center text-sm text-gray-500 mt-2">
-                {caption}
-            </figcaption>
-        )}
-    </figure>
-) : null}
-
-```
-
-gifファイルを `import` して渡したいので、コンポーネント側でURLに変換している。
+`.gif` や `.svg` は `<Picture/>` や `<Image/>` で扱えるらしい。
 
 ```js
-import Gif from "../../../components/Gif.astro";
+import Figure from "../../../components/Figure.astro";
 import graph from './ex1.gif';
 
-<Gif 
+<Figure 
     src={graph} 
     alt="グラフ"
     caption="グラフ"
@@ -175,7 +118,7 @@ import graph from './ex1.gif';
 />
 ```
 
-<Gif 
+<Figure 
     src={graph} 
     alt="グラフ"
     caption="グラフ"
