@@ -285,3 +285,37 @@ const blogCollection = defineCollection({
 
 `src/components/BlogPostCard.astro` と `src/components/Layout/Layout.astro` をよしなに修正しておしまい。
 
+# サイトマップの作成
+
+公式のドキュメントに従って作業する。
+
+https://docs.astro.build/ja/guides/integrations-guide/sitemap/
+
+```bash
+$ npx astro add sitemap
+```
+
+`src/components/Layout/Layout.astro` に以下を追加。
+
+```astro
+<head>
+
+...
+
+<link rel="sitemap" href="/sitemap-index.xml" />
+
+...
+
+</head>
+```
+
+`public/robots.txt` を作成。
+
+```txt
+User-agent: *
+Allow: /
+
+Sitemap: https://aktardigrade13-blog.pages.dev/sitemap-index.xml
+```
+
+終わり。
