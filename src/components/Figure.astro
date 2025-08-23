@@ -10,11 +10,18 @@ type Props = {
 };
 
 const { caption, figureClass, ...rest } = Astro.props as Props;
+const userClass = rest.class;
+delete (rest as any).class;
 ---
 
 <figure class={figureClass}>
-    <br />
-    <Picture class="block mx-auto" {...rest} />
-    {caption && <figcaption class="text-center text-md text-gray-500 mt-2">{caption}</figcaption>}
-    <br />
+    <Picture
+        class:list={["block mx-auto", userClass]}
+        {...rest}
+    />
+    {caption && (
+        <figcaption class="text-center text-sm text-gray-500 mt-2">
+            {caption}
+        </figcaption>
+    )}
 </figure>

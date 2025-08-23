@@ -65,15 +65,21 @@ type Props = {
 };
 
 const { caption, figureClass, ...rest } = Astro.props as Props;
+const userClass = rest.class;
+delete (rest as any).class;
 ---
 
 <figure class={figureClass}>
-    <br />
-    <Picture class="block mx-auto" {...rest} />
-    {caption && <figcaption class="text-center text-md text-gray-500 mt-2">{caption}</figcaption>}
-    <br />
+    <Picture
+        class:list={["block mx-auto", userClass]}
+        {...rest}
+    />
+    {caption && (
+        <figcaption class="text-center text-sm text-gray-500 mt-2">
+            {caption}
+        </figcaption>
+    )}
 </figure>
-
 ```
 
 `...` をスプレッド構文というらしい。便利なものがあるもんで。知らなかった。
@@ -86,7 +92,7 @@ import books from './books.jpg'
     src={books} 
     alt="積んでいる小説"
     caption="積んでいる小説"
-    class="max-w-xl mx-auto"
+    class="max-w-xl"
 />
 ```
 
@@ -94,7 +100,7 @@ import books from './books.jpg'
     src={books} 
     alt="積んでいる小説"
     caption="積んでいる小説"
-    class="max-w-xl mx-auto"
+    class="max-w-xl"
 />
 
 gif、動画も同じ要領でやる。
@@ -103,25 +109,56 @@ gif、動画も同じ要領でやる。
 
 ```astro
 ---
-type SrcLike = string | { src: string };
+import type { ImageMetadata } from "astro";
+
+type SrcLike = string | URL | { src: string } | ImageMetadata;
+
 type Props = {
     src: SrcLike;
     alt: string;
     caption?: string;
     figureClass?: string;
+    // width, height, loading, decoding, class など任意
     [key: string]: any;
 };
-const { caption, figureClass, src, ...rest } = Astro.props as Props;
 
-const resolvedSrc = typeof src === "string" ? src : src?.src ?? "";
+const { caption, figureClass, src, alt, ...rest } = Astro.props as Props;
+
+// 文字列URLへ正規化
+const toUrl = (v: SrcLike): string =>
+    typeof v === "string"
+        ? v
+        : v instanceof URL
+        ? v.toString()
+        : "src" in v
+        ? v.src
+        : "";
+
+// class 上書きを避ける（rest.class は別処理）
+const userClass = (rest as any).class as string | undefined;
+delete (rest as any).class;
+
+const resolvedSrc = toUrl(src);
 ---
 
-<figure class={figureClass}>
-    <br />
-    <img src={resolvedSrc} class="block mx-auto" {...rest} />
-    {caption && <figcaption class="text-center text-md text-gray-500 mt-2">{caption}</figcaption>}
-    <br />
-</figure>
+{resolvedSrc ? (
+    <figure class={figureClass}>
+        <img
+            src={resolvedSrc}
+            alt={alt}
+            loading={rest.loading ?? "lazy"}
+            decoding={rest.decoding ?? "async"}
+            class:list={["block mx-auto", userClass]}
+            {...rest}
+        />
+        {caption && (
+            <figcaption class="text-center text-sm text-gray-500 mt-2">
+                {caption}
+            </figcaption>
+        )}
+    </figure>
+) : null}
+
 ```
 
 gifファイルを `import` して渡したいので、コンポーネント側でURLに変換している。
@@ -134,7 +171,7 @@ import graph from './ex1.gif';
     src={graph} 
     alt="グラフ"
     caption="グラフ"
-    class="max-w-xl mx-auto"
+    class="max-w-xl"
 />
 ```
 
@@ -142,7 +179,7 @@ import graph from './ex1.gif';
     src={graph} 
     alt="グラフ"
     caption="グラフ"
-    class="max-w-xl mx-auto"
+    class="max-w-xl"
 />
 
 ## 動画
@@ -152,53 +189,71 @@ import graph from './ex1.gif';
 type MaybeUrl = string | { src: string };
 
 type VideoSource = { src: MaybeUrl; type?: string };
-type VideoTrack  = {
-    src: MaybeUrl; kind?: string; srclang?: string; label?: string; default?: boolean;
+type VideoTrack = {
+    src: MaybeUrl;
+    kind?: string;
+    srclang?: string;
+    label?: string;
+    default?: boolean;
 };
 
 type Props = {
     src?: MaybeUrl;
     sources?: VideoSource[];
-
     tracks?: VideoTrack[];
     caption?: string;
     figureClass?: string;
-
     [key: string]: any;
 };
 
-const {
-    caption,
-    figureClass,
-    src,
-    sources = [],
-    tracks = [],
-    ...rest
-} = Astro.props as Props;
+const { caption, figureClass, src, sources = [], tracks = [], ...rest } =
+    Astro.props as Props;
 
 const toUrl = (v: MaybeUrl | undefined) =>
-    typeof v === "string" ? v : (v?.src ?? undefined);
+    typeof v === "string" ? v : v?.src ?? undefined;
 
 const resolvedSrc = toUrl(src);
-const resolvedSources = sources.map(({ src, type }) => ({ src: toUrl(src), type }));
-const resolvedTracks  = tracks.map(({ src, ...t }) => ({ src: toUrl(src), ...t }));
+const resolvedSources = sources.map(({ src, type }) => ({
+    src: toUrl(src),
+    type,
+}));
+const resolvedTracks = tracks.map(({ src, ...t }) => ({
+    src: toUrl(src),
+    ...t,
+}));
+
+const userClass = rest.class;
+delete (rest as any).class;
 ---
 
 <figure class={figureClass}>
     <video
-        class:list={["block mx-auto", rest.class]} 
-        {...{ ...rest, class: undefined }} 
+        class:list={["block mx-auto", userClass]}
+        {...rest}
         src={resolvedSrc}
     >
-        {resolvedSources.map(({ src, type }) => src && <source src={src} type={type} />)}
-        {resolvedTracks.map(({ src, kind, srclang, label, default: def }) =>
-            src && <track src={src} kind={kind} srclang={srclang} label={label} default={def} />
+        {resolvedSources.map(
+            ({ src, type }) => src && <source src={src} type={type} />
+        )}
+        {resolvedTracks.map(
+            ({ src, kind, srclang, label, default: def }) =>
+                src && (
+                    <track
+                        src={src}
+                        kind={kind}
+                        srclang={srclang}
+                        label={label}
+                        default={def}
+                    />
+            )
         )}
         お使いのブラウザは動画に対応していません
     </video>
 
     {caption && (
-        <figcaption class="text-center text-gray-500 mt-2">{caption}</figcaption>
+        <figcaption class="text-center text-sm text-gray-500 mt-2">
+            {caption}
+        </figcaption>
     )}
 </figure>
 ```
@@ -218,7 +273,7 @@ import Lchika from './Lchika.mp4';
   muted
   playsinline
   preload="metadata"
-  class="max-w-xl mx-auto"
+  class="max-w-xl"
 />
 ```
 
@@ -231,7 +286,7 @@ import Lchika from './Lchika.mp4';
   muted
   playsinline
   preload="metadata"
-  class="max-w-xl mx-auto"
+  class="max-w-xl"
 />
 
 # 画像を public から src へ

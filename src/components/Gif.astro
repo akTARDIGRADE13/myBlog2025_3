@@ -1,20 +1,50 @@
 ---
-type SrcLike = string | { src: string };
+import type { ImageMetadata } from "astro";
+
+type SrcLike = string | URL | { src: string } | ImageMetadata;
+
 type Props = {
     src: SrcLike;
     alt: string;
     caption?: string;
     figureClass?: string;
+    // width, height, loading, decoding, class など任意
     [key: string]: any;
 };
-const { caption, figureClass, src, ...rest } = Astro.props as Props;
 
-const resolvedSrc = typeof src === "string" ? src : src?.src ?? "";
+const { caption, figureClass, src, alt, ...rest } = Astro.props as Props;
+
+// 文字列URLへ正規化
+const toUrl = (v: SrcLike): string =>
+    typeof v === "string"
+        ? v
+        : v instanceof URL
+        ? v.toString()
+        : "src" in v
+        ? v.src
+        : "";
+
+// class 上書きを避ける（rest.class は別処理）
+const userClass = (rest as any).class as string | undefined;
+delete (rest as any).class;
+
+const resolvedSrc = toUrl(src);
 ---
 
-<figure class={figureClass}>
-    <br />
-    <img src={resolvedSrc} class="block mx-auto" {...rest} />
-    {caption && <figcaption class="text-center text-md text-gray-500 mt-2">{caption}</figcaption>}
-    <br />
-</figure>
+{resolvedSrc ? (
+    <figure class={figureClass}>
+        <img
+            src={resolvedSrc}
+            alt={alt}
+            loading={rest.loading ?? "lazy"}
+            decoding={rest.decoding ?? "async"}
+            class:list={["block mx-auto", userClass]}
+            {...rest}
+        />
+        {caption && (
+            <figcaption class="text-center text-sm text-gray-500 mt-2">
+                {caption}
+            </figcaption>
+        )}
+    </figure>
+) : null}
