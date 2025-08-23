@@ -11,12 +11,12 @@ const updatesCollection = defineCollection({
 });
 
 const blogCollection = defineCollection({
-    schema: z.object({
+    schema: ({ image }) =>  z.object({
         id: z.string(),
         title: z.string(),
         date: z.string(),
         updated: z.string(),
-        eyecatch: z.string(),
+        eyecatch: image().optional(),
         tags: z.array(z.string()),
     }),
 });      

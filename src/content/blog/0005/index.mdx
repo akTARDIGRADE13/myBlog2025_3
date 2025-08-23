@@ -234,4 +234,54 @@ import Lchika from './Lchika.mp4';
   class="max-w-xl mx-auto"
 />
 
+# 画像を public から src へ
+
+最適化の恩恵が受けられるので、基本的に画像は `public` ではなく `src` の方に置くのが良いらしい。
+
+アイキャッチ兼OGP画像が `public` に置かれているので、それを `src` に移す。
+
+今までフロントマターで以下のようにアイキャッチ画像を指定していた。
+
+```md
+---
+id: "4"
+title: "マイヤーの関係"
+date: "2025-05-26"
+updated: "2025-05-26"
+eyecatch: "/blog/0004/eyecatch.png"
+tags: ["物理", "熱力学"]
+---
+```
+
+```ts
+const blogCollection = defineCollection({
+    schema: z.object({
+        id: z.string(),
+        title: z.string(),
+        date: z.string(),
+        updated: z.string(),
+        eyecatch: z.string(),
+        tags: z.array(z.string()),
+    }),
+});   
+```
+
+このパスは `public` 以下からの相対パスなので、ビルド後もパスは変わらない。
+
+これを `src` 以下に移すと、ビルド後にパスが変わって困るのだけど、 `src/content/config.ts` を以下のように修正すると、このパスを文字列ではなく ImageMetadata として扱えるようになる。
+
+```ts
+const blogCollection = defineCollection({
+    schema: ({ image }) => z.object({
+        id: z.string(),
+        title: z.string(),
+        date: z.string(),
+        updated: z.string(),
+        eyecatch: image().optional(),
+        tags: z.array(z.string()),
+    }),
+});  
+```
+
+`src/components/BlogPostCard.astro` と `src/components/Layout/Layout.astro` をよしなに修正しておしまい。
 
