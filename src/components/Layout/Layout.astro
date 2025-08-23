@@ -9,9 +9,16 @@ const defaultSite = 'https://aktardigrade13-blog.pages.dev';
 // Astro.siteが文字列またはURLオブジェクトの場合に備えて、toString()で文字列に変換する
 const siteValue = (Astro.site ?? defaultSite).toString();
 const siteUrl = siteValue.endsWith('/') ? siteValue.slice(0, -1) : siteValue;
-const { title, eyecatch } = Astro.props;
+const { title, eyecatch } = Astro.props as {
+    title?: string;
+    eyecatch?: string | { src: string };
+};
 const defaultEyecatch = '/default-eyecatch.png'; // eyecatch 未指定時のデフォルト画像
-const ogImageUrl = eyecatch ? `${siteUrl}${eyecatch}` : `${siteUrl}${defaultEyecatch}`;
+
+const toAbs = (p?: string) => (p ? new URL(p, siteUrl).toString() : undefined);
+const imageSrc = typeof eyecatch === 'string' ? eyecatch : eyecatch?.src;
+const ogImageUrl = toAbs(imageSrc) ?? toAbs(defaultEyecatch)!;
+
 const fullTitle = title ? `${title} - ${Astro.site}` : Astro.site;
 ---
 

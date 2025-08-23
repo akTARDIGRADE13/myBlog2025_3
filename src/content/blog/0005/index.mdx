@@ -1,0 +1,287 @@
+---
+id: "5"
+title: "サイトの改善いろいろ"
+date: "2025-08-24"
+updated: "2025-08-24"
+eyecatch: ""
+tags: ["サイト運用", "astro"]
+---
+
+import { YouTube } from "@astro-community/astro-embed-youtube";
+import Figure from "../../../components/Figure.astro";
+import books from './books.jpg';
+import Gif from "../../../components/Gif.astro";
+import graph from './ex1.gif';
+import Video from "../../../components/Video.astro";
+import Lchika from './Lchika.mp4';
+
+# やること
+
+- YouTube動画を記事中に埋め込めるようにする
+- 画像、gif、動画のUIコンポーネントを作る
+    - キャプションをつけたいだけ
+- `eyecatch`用の画像を`public`から`src`に移す
+- サイトマップの作成
+
+# YouTubeの埋め込み
+
+　`astro-embed-youtube`というコンポーネントを利用する。
+
+https://astro-embed.netlify.app/components/youtube/
+
+公式ドキュメントに則って作業を進める。
+```bash
+$ npm install @astro-community/astro-embed-youtube
+```
+
+終わり。
+
+```md
+---
+title: "YouTubeの埋め込み"
+---
+import { YouTube } from "@astro-community/astro-embed-youtube";
+<YouTube id="Jak2qiq_jJo" posterQuality="max" title="【初音ミク】 メリュー 【オリジナル】 HatsuneMiku - Meru" class="mx-auto"/>
+```
+
+<YouTube id="Jak2qiq_jJo" posterQuality="max" title="【初音ミク】 メリュー 【オリジナル】 HatsuneMiku - Meru" class="mx-auto"/>
+
+# 画像、gif、動画のUIコンポーネント
+
+## 画像
+
+`<Picture/>` は `<Image/>` の完全上位互換っぽい。
+
+```astro
+---
+import { Picture } from "astro:assets";
+
+type Props = {
+    src: any;
+    alt: string;
+    caption?: string;
+    figureClass?: string;
+    [key: string]: any;
+};
+
+const { caption, figureClass, ...rest } = Astro.props as Props;
+---
+
+<figure class={figureClass}>
+    <br />
+    <Picture class="block mx-auto" {...rest} />
+    {caption && <figcaption class="text-center text-md text-gray-500 mt-2">{caption}</figcaption>}
+    <br />
+</figure>
+
+```
+
+`...` をスプレッド構文というらしい。便利なものがあるもんで。知らなかった。
+
+```js
+import Figure from "../../../components/Figure.astro";
+import books from './books.jpg'
+
+<Figure 
+    src={books} 
+    alt="積んでいる小説"
+    caption="積んでいる小説"
+    class="max-w-xl mx-auto"
+/>
+```
+
+<Figure 
+    src={books} 
+    alt="積んでいる小説"
+    caption="積んでいる小説"
+    class="max-w-xl mx-auto"
+/>
+
+gif、動画も同じ要領でやる。
+
+## gif
+
+```astro
+---
+type SrcLike = string | { src: string };
+type Props = {
+    src: SrcLike;
+    alt: string;
+    caption?: string;
+    figureClass?: string;
+    [key: string]: any;
+};
+const { caption, figureClass, src, ...rest } = Astro.props as Props;
+
+const resolvedSrc = typeof src === "string" ? src : src?.src ?? "";
+---
+
+<figure class={figureClass}>
+    <br />
+    <img src={resolvedSrc} class="block mx-auto" {...rest} />
+    {caption && <figcaption class="text-center text-md text-gray-500 mt-2">{caption}</figcaption>}
+    <br />
+</figure>
+```
+
+gifファイルを `import` して渡したいので、コンポーネント側でURLに変換している。
+
+```js
+import Gif from "../../../components/Gif.astro";
+import graph from './ex1.gif';
+
+<Gif 
+    src={graph} 
+    alt="グラフ"
+    caption="グラフ"
+    class="max-w-xl mx-auto"
+/>
+```
+
+<Gif 
+    src={graph} 
+    alt="グラフ"
+    caption="グラフ"
+    class="max-w-xl mx-auto"
+/>
+
+## 動画
+
+```astro
+---
+type MaybeUrl = string | { src: string };
+
+type VideoSource = { src: MaybeUrl; type?: string };
+type VideoTrack  = {
+    src: MaybeUrl; kind?: string; srclang?: string; label?: string; default?: boolean;
+};
+
+type Props = {
+    src?: MaybeUrl;
+    sources?: VideoSource[];
+
+    tracks?: VideoTrack[];
+    caption?: string;
+    figureClass?: string;
+
+    [key: string]: any;
+};
+
+const {
+    caption,
+    figureClass,
+    src,
+    sources = [],
+    tracks = [],
+    ...rest
+} = Astro.props as Props;
+
+const toUrl = (v: MaybeUrl | undefined) =>
+    typeof v === "string" ? v : (v?.src ?? undefined);
+
+const resolvedSrc = toUrl(src);
+const resolvedSources = sources.map(({ src, type }) => ({ src: toUrl(src), type }));
+const resolvedTracks  = tracks.map(({ src, ...t }) => ({ src: toUrl(src), ...t }));
+---
+
+<figure class={figureClass}>
+    <video
+        class:list={["block mx-auto", rest.class]} 
+        {...{ ...rest, class: undefined }} 
+        src={resolvedSrc}
+    >
+        {resolvedSources.map(({ src, type }) => src && <source src={src} type={type} />)}
+        {resolvedTracks.map(({ src, kind, srclang, label, default: def }) =>
+            src && <track src={src} kind={kind} srclang={srclang} label={label} default={def} />
+        )}
+        お使いのブラウザは動画に対応していません
+    </video>
+
+    {caption && (
+        <figcaption class="text-center text-gray-500 mt-2">{caption}</figcaption>
+    )}
+</figure>
+```
+
+webページに動画を載せたことがなかったので知らなかったんだけど、結構いろんなオプションがつけられるっぽい。すげー。
+
+```js
+import Video from "../../../components/Video.astro";
+import Lchika from './Lchika.mp4';
+
+<Video
+  src={Lchika}
+  alt="Lチカ"
+  caption="Lチカ"
+  autoplay
+  loop
+  muted
+  playsinline
+  preload="metadata"
+  class="max-w-xl mx-auto"
+/>
+```
+
+<Video
+  src={Lchika}
+  alt="Lチカ"
+  caption="Lチカ"
+  autoplay
+  loop
+  muted
+  playsinline
+  preload="metadata"
+  class="max-w-xl mx-auto"
+/>
+
+# 画像を public から src へ
+
+最適化の恩恵が受けられるので、基本的に画像は `public` ではなく `src` の方に置くのが良いらしい。
+
+アイキャッチ兼OGP画像が `public` に置かれているので、それを `src` に移す。
+
+今までフロントマターで以下のようにアイキャッチ画像を指定していた。
+
+```md
+---
+id: "4"
+title: "マイヤーの関係"
+date: "2025-05-26"
+updated: "2025-05-26"
+eyecatch: "/blog/0004/eyecatch.png"
+tags: ["物理", "熱力学"]
+---
+```
+
+```ts
+const blogCollection = defineCollection({
+    schema: z.object({
+        id: z.string(),
+        title: z.string(),
+        date: z.string(),
+        updated: z.string(),
+        eyecatch: z.string(),
+        tags: z.array(z.string()),
+    }),
+});   
+```
+
+このパスは `public` 以下からの相対パスなので、ビルド後もパスは変わらない。
+
+これを `src` 以下に移すと、ビルド後にパスが変わって困るのだけど、 `src/content/config.ts` を以下のように修正すると、このパスを文字列ではなく ImageMetadata として扱えるようになる。
+
+```ts
+const blogCollection = defineCollection({
+    schema: ({ image }) => z.object({
+        id: z.string(),
+        title: z.string(),
+        date: z.string(),
+        updated: z.string(),
+        eyecatch: image().optional(),
+        tags: z.array(z.string()),
+    }),
+});  
+```
+
+`src/components/BlogPostCard.astro` と `src/components/Layout/Layout.astro` をよしなに修正しておしまい。
+
