@@ -30,9 +30,7 @@ const allPosts: CollectionEntry<'blog'>[] = await getCollection('blog');
 const blogPosts = import.meta.env.DEV
     ? allPosts
     : allPosts.filter(post => !post.slug.includes('test_'));
-blogPosts.sort(
-    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
-);
+blogPosts.sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10));
 
 // 現在のタグを URL から取得
 const currentTag = Astro.params.tag as string;
