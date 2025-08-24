@@ -70,7 +70,7 @@ delete (rest as any).class;
 
 <figure class={figureClass}>
     <Picture
-        class:list={["block mx-auto", userClass]}
+        class:list={["block mx-auto md:max-w-xl lg:max-w-2xl", userClass]}
         {...rest}
     />
     {caption && (
@@ -91,7 +91,6 @@ import books from './books.jpg'
     src={books} 
     alt="積んでいる小説"
     caption="積んでいる小説"
-    class="max-w-xl"
 />
 ```
 
@@ -99,7 +98,6 @@ import books from './books.jpg'
     src={books} 
     alt="積んでいる小説"
     caption="積んでいる小説"
-    class="max-w-xl"
 />
 
 ## gif
@@ -114,7 +112,6 @@ import graph from './ex1.gif';
     src={graph} 
     alt="グラフ"
     caption="グラフ"
-    class="max-w-xl"
 />
 ```
 
@@ -122,7 +119,6 @@ import graph from './ex1.gif';
     src={graph} 
     alt="グラフ"
     caption="グラフ"
-    class="max-w-xl"
 />
 
 ## 動画
@@ -171,7 +167,7 @@ delete (rest as any).class;
 
 <figure class={figureClass}>
     <video
-        class:list={["block mx-auto", userClass]}
+        class:list={["block mx-auto md:max-w-xl lg:max-w-2xl", userClass]}
         {...rest}
         src={resolvedSrc}
     >
@@ -216,7 +212,6 @@ import Lchika from './Lchika.mp4';
   muted
   playsinline
   preload="metadata"
-  class="max-w-xl"
 />
 ```
 
@@ -229,7 +224,6 @@ import Lchika from './Lchika.mp4';
   muted
   playsinline
   preload="metadata"
-  class="max-w-xl"
 />
 
 # 画像を public から src へ
