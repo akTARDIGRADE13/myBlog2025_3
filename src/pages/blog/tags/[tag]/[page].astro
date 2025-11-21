@@ -13,9 +13,7 @@ const POSTS_PER_PAGE = 10;
 export async function getStaticPaths() {
     const POSTS_PER_PAGE = 10;
     const blogPosts: CollectionEntry<'blog'>[] = await getCollection('blog');
-    blogPosts.sort(
-        (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
-    );
+    blogPosts.sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10));
     const tagSet = new Set<string>();
     blogPosts.forEach(post => {
         if (post.data.tags && Array.isArray(post.data.tags)) {
@@ -48,7 +46,7 @@ const allPosts: CollectionEntry<'blog'>[] = await getCollection('blog');
 // 開発環境ならすべて、ビルド時なら "test_" を含む記事を除外
 const blogPosts = import.meta.env.DEV
     ? allPosts
-    : allPosts.filter(post => !post.slug.includes('test_'));
+    : allPosts.filter(post => !post.slug.includes('test_') && !post.slug.includes("wip_"));
 
 blogPosts.sort(
     (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
