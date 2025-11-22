@@ -3,7 +3,6 @@ import type { CoverSource, BiblioSource, BookCardData } from "../types/book";
 import { getBookCardData } from "../utils/book-api";
 import { getNdcLabelFromCode } from "../utils/ndc";
 
-
 interface Props {
     isbn: string;
     coverSource?: CoverSource;
@@ -14,6 +13,7 @@ interface Props {
         | "indigo" | "blue" | "sky" | "cyan" | "teal"
         | "emerald" | "green" | "lime" | "yellow"
         | "amber" | "orange" | "red";
+    authorOverride?: string;
 }
 
 const {
@@ -21,7 +21,8 @@ const {
     coverSource = "auto",
     biblioSource = "openbd",
     borderColor = "neutral",
-} = Astro.props;
+    authorOverride,
+} = Astro.props as Props;
 
 const data: BookCardData | null = await getBookCardData(isbn, {
     coverSource,
@@ -55,6 +56,11 @@ const borderClassMap: Record<NonNullable<Props["borderColor"]>, string> = {
 
 const borderClass = borderClassMap[borderColor];
 
+/**
+ * 表示用に ISBN を正規化する
+ * - 13桁の数字だけに統一（ハイフン除去）
+ * - 13桁じゃなければ元の文字列をそのまま返す
+ */
 function normalizeIsbn13Display(isbnRaw: string): string {
     const digits = isbnRaw.replace(/[^0-9Xx]/g, "");
     if (digits.length === 13) {
@@ -64,6 +70,16 @@ function normalizeIsbn13Display(isbnRaw: string): string {
 }
 
 const displayIsbn = data ? normalizeIsbn13Display(data.isbn) : "";
+
+// 著者表示用テキスト
+const authorsFromData = data?.authors ?? [];
+const authorsDisplay =
+    authorOverride && authorOverride.trim().length > 0
+        ? authorOverride.trim()
+        : (authorsFromData.length ? authorsFromData.join(" / ") : "不明");
+
+// NDC 表示用
+const ndcLabel = data?.ndc ? getNdcLabelFromCode(data.ndc) : undefined;
 ---
 
 {data ? (
@@ -92,7 +108,7 @@ const displayIsbn = data ? normalizeIsbn13Display(data.isbn) : "";
                     <div class="flex gap-2">
                         <span class="text-gray-500 min-w-[3rem]">著者</span>
                         <span class="text-gray-900">
-                            {data.authors.join(" / ") || "不明"}
+                            {authorsDisplay}
                         </span>
                     </div>
 
@@ -114,7 +130,7 @@ const displayIsbn = data ? normalizeIsbn13Display(data.isbn) : "";
                         <div class="flex gap-2">
                             <span class="text-gray-500 min-w-[3rem]">分類</span>
                             <span class="text-gray-900">
-                                {getNdcLabelFromCode(data.ndc) ?? data.ndc}
+                                {ndcLabel ?? data.ndc}
                                 {" "}
                                 （{data.ndc}）
                             </span>

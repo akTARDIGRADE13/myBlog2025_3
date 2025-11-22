@@ -24,23 +24,27 @@ interface NDLBiblio {
    文字整形ユーティリティ
 ============================ */
 
-// "辻村,深月,1980-" → "辻村 深月"
-// "Rowling, J.K." → "Rowling J.K."（カンマをスペースに）
-function normalizeAuthorName(raw: string): string {
-    let s = raw.trim();
-    if (!s) return s;
+export function normalizeAuthorName(raw: string): string {
+    if (!raw) return "";
 
-    const parts = s.split(/[,，]/).map(p => p.trim()).filter(Boolean);
+    return raw
+        .split(/[／、;|]/)
+        .map(part => part.trim())
+        .filter(Boolean)
+        .map(name => {
+            // 生没年削除
+            name = name.replace(/\d{4}\s*-\s*\d{0,4}/g, "").trim();
 
-    if (parts.length >= 2) {
-        const last = parts[parts.length - 1];
-        if (/^\d{4}-?$/.test(last)) {
-            parts.pop(); // 生年情報を落とす
-        }
-        return parts.join(" ");
-    }
+            // "姓,名" → "姓 名"
+            const commaStyle = name.split(/[,，]/).map(p => p.trim()).filter(Boolean);
+            if (commaStyle.length >= 2) {
+                return commaStyle.join(" ");
+            }
 
-    return s;
+            return name;
+        })
+        .filter(Boolean)
+        .join(" / ");
 }
 
 // 出版日を整形: 202209 → 2022-09, 20220930 → 2022-09-30
