@@ -6,11 +6,13 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "build:ndc": "node scripts/build-ndc-map.mjs"
   },
   "dependencies": {
     "@astro-community/astro-embed-youtube": "^0.5.6",
     "@astrojs/mdx": "^4.1.0",
+    "@astrojs/rss": "^4.0.14",
     "@astrojs/sitemap": "^3.5.1",
     "@tailwindcss/vite": "^4.0.14",
     "astro": "^5.4.1",
@@ -23,6 +25,7 @@
     "tailwindcss": "^4.0.14"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.16"
+    "@tailwindcss/typography": "^0.5.16",
+    "n3": "^1.26.0"
   }
 }

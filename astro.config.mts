@@ -133,7 +133,7 @@ const katexMacros = {
 
 // https://astro.build/config
 export default defineConfig({
-    site: "https://aktardigrade13-blog.pages.dev",
+    site: "https://aktars-blog.com",
     integrations: [mdx(), sitemap()],
     vite: {
         plugins: [tailwindcss()],

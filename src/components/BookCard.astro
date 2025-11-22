@@ -1,0 +1,169 @@
+---
+import type { CoverSource, BiblioSource, BookCardData } from "../types/book";
+import { getBookCardData } from "../utils/book-api";
+import { getNdcLabelFromCode } from "../utils/ndc";
+
+interface Props {
+    isbn: string;
+    coverSource?: CoverSource;
+    biblioSource?: BiblioSource;
+    borderColor?:
+        | "stone" | "neutral" | "zinc" | "gray" | "slate"
+        | "rose" | "pink" | "fuchsia" | "purple" | "violet"
+        | "indigo" | "blue" | "sky" | "cyan" | "teal"
+        | "emerald" | "green" | "lime" | "yellow"
+        | "amber" | "orange" | "red";
+    authorOverride?: string;
+}
+
+const {
+    isbn,
+    coverSource = "auto",
+    biblioSource = "openbd",
+    borderColor = "neutral",
+    authorOverride,
+} = Astro.props as Props;
+
+const data: BookCardData | null = await getBookCardData(isbn, {
+    coverSource,
+    biblioSource,
+});
+
+const borderClassMap: Record<NonNullable<Props["borderColor"]>, string> = {
+    stone: "border-stone-300",
+    neutral: "border-neutral-300",
+    zinc: "border-zinc-300",
+    gray: "border-gray-300",
+    slate: "border-slate-300",
+    rose: "border-rose-300",
+    pink: "border-pink-300",
+    fuchsia: "border-fuchsia-300",
+    purple: "border-purple-300",
+    violet: "border-violet-300",
+    indigo: "border-indigo-300",
+    blue: "border-blue-300",
+    sky: "border-sky-300",
+    cyan: "border-cyan-300",
+    teal: "border-teal-300",
+    emerald: "border-emerald-300",
+    green: "border-green-300",
+    lime: "border-lime-300",
+    yellow: "border-yellow-300",
+    amber: "border-amber-300",
+    orange: "border-orange-300",
+    red: "border-red-300",
+};
+
+const borderClass = borderClassMap[borderColor];
+
+/**
+ * 表示用に ISBN を正規化する
+ * - 13桁の数字だけに統一（ハイフン除去）
+ * - 13桁じゃなければ元の文字列をそのまま返す
+ */
+function normalizeIsbn13Display(isbnRaw: string): string {
+    const digits = isbnRaw.replace(/[^0-9Xx]/g, "");
+    if (digits.length === 13) {
+        return digits;
+    }
+    return isbnRaw;
+}
+
+const displayIsbn = data ? normalizeIsbn13Display(data.isbn) : "";
+
+// 著者表示用テキスト
+const authorsFromData = data?.authors ?? [];
+const authorsDisplay =
+    authorOverride && authorOverride.trim().length > 0
+        ? authorOverride.trim()
+        : (authorsFromData.length ? authorsFromData.join(" / ") : "不明");
+
+// NDC 表示用
+const ndcLabel = data?.ndc ? getNdcLabelFromCode(data.ndc) : undefined;
+---
+
+{data ? (
+    <div class={`max-w-xl mx-auto bg-white rounded-xl shadow-sm p-5 border ${borderClass} mb-4 last:mb-0`}>
+        <div class="flex gap-4">
+            {data.coverUrl && (
+                <img
+                    src={data.coverUrl}
+                    alt={data.title}
+                    class="w-24 h-auto rounded-md shadow-sm object-contain bg-gray-50"
+                    loading="lazy"
+                />
+            )}
+
+            <div class="flex-1">
+                {/* タイトル行 */}
+                <div class="flex items-center gap-3">
+                    <div class="w-1.5 h-6 rounded-full bg-teal-400"></div>
+                    <div class="book-card-title">
+                        {data.title}
+                    </div>
+                </div>
+
+                {/* メタ情報 */}
+                <div class="mt-3 space-y-2 text-sm">
+                    <div class="flex gap-2">
+                        <span class="text-gray-500 min-w-[3rem]">著者</span>
+                        <span class="text-gray-900">
+                            {authorsDisplay}
+                        </span>
+                    </div>
+
+                    {data.publisher && (
+                        <div class="flex gap-2">
+                            <span class="text-gray-500 min-w-[3rem]">出版社</span>
+                            <span class="text-gray-900">{data.publisher}</span>
+                        </div>
+                    )}
+
+                    {data.pubdate && (
+                        <div class="flex gap-2">
+                            <span class="text-gray-500 min-w-[3rem]">出版日</span>
+                            <span class="text-gray-900">{data.pubdate}</span>
+                        </div>
+                    )}
+
+                    {data.ndc && (
+                        <div class="flex gap-2">
+                            <span class="text-gray-500 min-w-[3rem]">分類</span>
+                            <span class="text-gray-900">
+                                {ndcLabel ?? data.ndc}
+                                {" "}
+                                （{data.ndc}）
+                            </span>
+                        </div>
+                    )}
+                </div>
+
+                {/* ISBN */}
+                {displayIsbn && (
+                    <div class="mt-3 flex justify-end">
+                        <span class="text-[0.75rem] text-gray-400 tracking-wide">
+                            ISBN {displayIsbn}
+                        </span>
+                    </div>
+                )}
+            </div>
+        </div>
+
+        {data.ndlLink && (
+            <div class="mt-3 text-right">
+                <a
+                    href={data.ndlLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    class="text-xs font-medium text-teal-600 hover:text-teal-800 transition"
+                >
+                    国立国会図書館で見る →
+                </a>
+            </div>
+        )}
+    </div>
+) : (
+    <p class="text-sm text-gray-500 text-center">
+        ISBN {isbn} の情報が見つかりませんでした。
+    </p>
+)}
