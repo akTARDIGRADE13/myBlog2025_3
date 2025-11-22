@@ -1,4 +1,4 @@
-[![GitHub Pages](https://img.shields.io/static/v1?label=GitHub+Pages&message=+&color=brightgreen&logo=github)](https://aktardigrade13-blog.pages.dev/)
+[![Blog](https://img.shields.io/static/v1?label=Blog&message=+&color=brightgreen&logo=astro)](https://aktars-blog.com)
 
 # Astro Starter Kit: Basics
 
