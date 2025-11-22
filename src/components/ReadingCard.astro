@@ -1,6 +1,8 @@
 ---
 import type { CoverSource, BiblioSource, BookCardData } from "../types/book";
 import { getBookCardData } from "../utils/book-api";
+import { getNdcLabelFromCode } from "../utils/ndc";
+
 
 interface Props {
     isbn: string;
@@ -52,10 +54,20 @@ const borderClassMap: Record<NonNullable<Props["borderColor"]>, string> = {
 };
 
 const borderClass = borderClassMap[borderColor];
+
+function normalizeIsbn13Display(isbnRaw: string): string {
+    const digits = isbnRaw.replace(/[^0-9Xx]/g, "");
+    if (digits.length === 13) {
+        return digits;
+    }
+    return isbnRaw;
+}
+
+const displayIsbn = data ? normalizeIsbn13Display(data.isbn) : "";
 ---
 
 {data ? (
-    <div class={`max-w-xl mx-auto bg-white rounded-xl shadow-sm p-5 m-4 border ${borderClass}`}>
+    <div class={`max-w-xl mx-auto bg-white rounded-xl shadow-sm p-5 border ${borderClass} mb-4 last:mb-0`}>
         <div class="flex gap-4">
             {data.coverUrl && (
                 <img
@@ -67,6 +79,7 @@ const borderClass = borderClassMap[borderColor];
             )}
 
             <div class="flex-1">
+                {/* タイトル行 */}
                 <div class="flex items-center gap-3">
                     <div class="w-1.5 h-6 rounded-full bg-teal-400"></div>
                     <div class="book-card-title">
@@ -74,6 +87,7 @@ const borderClass = borderClassMap[borderColor];
                     </div>
                 </div>
 
+                {/* メタ情報 */}
                 <div class="mt-3 space-y-2 text-sm">
                     <div class="flex gap-2">
                         <span class="text-gray-500 min-w-[3rem]">著者</span>
@@ -96,18 +110,31 @@ const borderClass = borderClassMap[borderColor];
                         </div>
                     )}
 
-                    <div class="flex gap-2">
-                        <span class="text-gray-500 min-w-[3rem]">ISBN</span>
-                        <span class="text-gray-900 tracking-wide">
-                            {data.isbn}
+                    {data.ndc && (
+                        <div class="flex gap-2">
+                            <span class="text-gray-500 min-w-[3rem]">分類</span>
+                            <span class="text-gray-900">
+                                {getNdcLabelFromCode(data.ndc) ?? data.ndc}
+                                {" "}
+                                （{data.ndc}）
+                            </span>
+                        </div>
+                    )}
+                </div>
+
+                {/* ISBN */}
+                {displayIsbn && (
+                    <div class="mt-3 flex justify-end">
+                        <span class="text-[0.75rem] text-gray-400 tracking-wide">
+                            ISBN {displayIsbn}
                         </span>
                     </div>
-                </div>
+                )}
             </div>
         </div>
 
         {data.ndlLink && (
-            <div class="mt-4 text-right">
+            <div class="mt-3 text-right">
                 <a
                     href={data.ndlLink}
                     target="_blank"

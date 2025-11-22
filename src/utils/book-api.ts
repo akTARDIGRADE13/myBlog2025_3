@@ -98,17 +98,20 @@ export async function fetchFromNDL(isbn: string): Promise<NDLBiblio | null> {
 
     const titleMatch = xmlText.match(/<title>([^<]+)<\/title>/);
     const creatorMatch = xmlText.match(/<dc:creator>([^<]+)<\/dc:creator>/);
-    const ndcMatch = xmlText.match(/<dc:subject>(NDLC[^<]+)<\/dc:subject>/);
-    const linkMatch = xmlText.match(/<link[^>]*rel="alternate"[^>]*href="([^"]+)"/);
 
-    const authors = creatorMatch
-        ? [normalizeAuthorName(creatorMatch[1])]
-        : [];
+    const ndcMatch = xmlText.match(
+        /<dc:subject[^>]*dcndl:(?:NDC10|NDC9|NDC8|NDC)[^>]*>([^<]+)<\/dc:subject>/
+    );
+    const ndlcMatch = xmlText.match(
+        /<dc:subject[^>]*dcndl:NDLC[^>]*>([^<]+)<\/dc:subject>/
+    );
+
+    const linkMatch = xmlText.match(/<link[^>]*rel="alternate"[^>]*href="([^"]+)"/);
 
     return {
         title: titleMatch?.[1],
-        authors,
-        ndc: ndcMatch?.[1],
+        authors: creatorMatch ? [normalizeAuthorName(creatorMatch[1])] : [],
+        ndc: ndcMatch?.[1] ?? ndlcMatch?.[1],
         ndlLink: linkMatch?.[1],
         raw: xmlText,
     };
