@@ -1,4 +1,8 @@
-export type CoverSource = "openbd" | "ndl" | "auto";
+export type CoverSource =
+    | "openbd"    // OpenBD の書影のみ使う
+    | "ndl-isbn"  // NDL の ISBN ベースの書影のみ使う
+    | "ndl-jpe";  // NDL の JP-e ベースの書影のみ使う
+
 export type BiblioSource = "openbd" | "ndl";
 
 export interface BookCardData {

@@ -17,6 +17,8 @@ interface NDLBiblio {
     authors: string[];
     ndc?: string;
     ndlLink?: string;
+    /** NDL 書影APIで使う JP-e コード（20桁） */
+    jpeCode?: string;
     raw: any;
 }
 
@@ -69,8 +71,12 @@ function formatPubdate(pubdate?: string): string | undefined {
 ============================ */
 
 export async function fetchFromOpenBD(isbn: string): Promise<OpenBDBiblio | null> {
-    const res = await fetch(`${OPENBD_ENDPOINT}?isbn=${isbn}`);
+    const url = new URL(OPENBD_ENDPOINT);
+    url.searchParams.set("isbn", isbn);
+
+    const res = await fetch(url.toString());
     if (!res.ok) return null;
+
     const json = await res.json();
     const item = json?.[0];
     if (!item) return null;
@@ -112,11 +118,19 @@ export async function fetchFromNDL(isbn: string): Promise<NDLBiblio | null> {
 
     const linkMatch = xmlText.match(/<link[^>]*rel="alternate"[^>]*href="([^"]+)"/);
 
+    // JP-e コードを rdfs:seeAlso から抽出
+    // 例: <rdfs:seeAlso rdf:resource="https://www.books.or.jp/book-details/83220365e00000000000"/>
+    const jpeMatch = xmlText.match(
+        /<rdfs:seeAlso[^>]*rdf:resource="https?:\/\/[^\/]+\/[^\/]+\/([0-9a-z]{20})"[^>]*>/i
+    );
+    const jpeCode = jpeMatch?.[1];
+
     return {
         title: titleMatch?.[1],
         authors: creatorMatch ? [normalizeAuthorName(creatorMatch[1])] : [],
         ndc: ndcMatch?.[1] ?? ndlcMatch?.[1],
         ndlLink: linkMatch?.[1],
+        jpeCode,
         raw: xmlText,
     };
 }
@@ -125,10 +139,19 @@ export async function fetchFromNDL(isbn: string): Promise<NDLBiblio | null> {
    書影URL生成
 ============================ */
 
-function buildNdlCoverUrl(isbn: string): string | undefined {
+/** NDL: ISBNベースの書影URL生成 */
+function buildNdlCoverUrlFromIsbn(isbn: string): string | undefined {
     const digits = isbn.replace(/[^0-9Xx]/g, "");
     if (digits.length === 13) {
         return `https://ndlsearch.ndl.go.jp/thumbnail/${digits}.jpg`;
+    }
+    return undefined;
+}
+
+/** NDL: JP-eベースの書影URL生成 */
+function buildNdlCoverUrlFromJpe(jpeCode?: string): string | undefined {
+    if (jpeCode && /^[0-9a-z]{20}$/i.test(jpeCode)) {
+        return `https://ndlsearch.ndl.go.jp/thumbnail/${jpeCode}.jpg`;
     }
     return undefined;
 }
@@ -146,7 +169,7 @@ export async function getBookCardData(
     isbn: string,
     options: GetBookCardOptions = {}
 ): Promise<BookCardData | null> {
-    const coverSource = options.coverSource ?? "auto";
+    const coverSource = options.coverSource ?? "ndl-jpe";
     const biblioSource = options.biblioSource ?? "openbd";
 
     const [openbd, ndl] = await Promise.all([
@@ -180,15 +203,27 @@ export async function getBookCardData(
             : ndl?.ndc;
 
     const openbdCover = openbd?.coverUrl?.trim() || undefined;
-    const ndlCover = buildNdlCoverUrl(isbn);
+    const ndlCoverFromIsbn = buildNdlCoverUrlFromIsbn(isbn);
+    const ndlCoverFromJpe = ndl ? buildNdlCoverUrlFromJpe(ndl.jpeCode) : undefined;
 
     let coverUrl: string | undefined;
-    if (coverSource === "openbd") {
-        coverUrl = openbdCover || ndlCover;
-    } else if (coverSource === "ndl") {
-        coverUrl = ndlCover || openbdCover;
-    } else {
-        coverUrl = openbdCover || ndlCover;
+
+    switch (coverSource) {
+        case "openbd":
+            // OpenBD の書影だけ
+            coverUrl = openbdCover;
+            break;
+        case "ndl-isbn":
+            // NDL ISBN 書影だけ
+            coverUrl = ndlCoverFromIsbn;
+            break;
+        case "ndl-jpe":
+            // NDL JP-e 書影だけ
+            coverUrl = ndlCoverFromJpe;
+            break;
+        default:
+            coverUrl = openbdCover || ndlCoverFromJpe || ndlCoverFromIsbn;
+            break;
     }
 
     return {
