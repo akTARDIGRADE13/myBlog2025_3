@@ -18,7 +18,7 @@ interface Props {
 
 const {
     isbn,
-    coverSource = "auto",
+    coverSource = "ndl-jpe",
     biblioSource = "openbd",
     borderColor = "neutral",
     authorOverride,
@@ -58,13 +58,18 @@ const borderClass = borderClassMap[borderColor];
 
 /**
  * 表示用に ISBN を正規化する
- * - 13桁の数字だけに統一（ハイフン除去）
+ * - JP-e サフィックス (.jp-e) が付いていても OK
+ * - 13桁の数字（+X）だけに統一（ハイフン等除去）
  * - 13桁じゃなければ元の文字列をそのまま返す
  */
 function normalizeIsbn13Display(isbnRaw: string): string {
-    const digits = isbnRaw.replace(/[^0-9Xx]/g, "");
-    if (digits.length === 13) {
-        return digits;
+    const cleaned = isbnRaw
+        .toLowerCase()
+        .replace(/\.jp-e$/, "")       // JP-e サフィックスを削る
+        .replace(/[^0-9x]/g, "");     // 数字と x/X 以外を削除
+
+    if (cleaned.length === 13) {
+        return cleaned;
     }
     return isbnRaw;
 }
