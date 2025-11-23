@@ -152,7 +152,7 @@ export default defineConfig({
         },
         remarkPlugins: [
             remarkMath,
-            [ remarkLinkCard, { cache: true, shortenUrl: true }],
+            [ remarkLinkCard, { cache: false, shortenUrl: true }],
         ],
         rehypePlugins: [
             [rehypeKatex, { macros: katexMacros }],
