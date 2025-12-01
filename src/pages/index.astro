@@ -3,6 +3,8 @@ import Layout from '../components/Layout/Layout.astro';
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 
+import scenery2025 from '../assets/scenery-2025.jpg';
+
 // "updates" コレクションから Markdown ファイルを取得し、日付順（新しい順）に並べ替え
 const updates: CollectionEntry<'updates'>[] = await getCollection('updates');
 updates.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
@@ -13,7 +15,7 @@ const latestUpdates = updates.slice(0, 3);
 
 <Layout title="Home" description="Welcome to our website!">
 	<!-- サイトの概要（背景画像を背景として利用） -->
-	<section class="relative bg-cover bg-center" style="background-image: url('/scenery.jpg');">
+	<section class="relative bg-cover bg-center" style={`background-image: url('${scenery2025.src}');`}>
 		<div class="container mx-auto px-4 py-16 md:px-8 md:py-32 text-center">
 		<!-- テキストコンテンツに白色の半透明背景を付与 -->
 		<div class="bg-white/95 p-6 md:p-20 rounded shadow-lg mx-4 md:mx-0">

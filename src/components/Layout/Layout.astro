@@ -6,6 +6,7 @@ import Footer from './Footer.astro';
 
 import type { ImageMetadata } from 'astro';
 import defaultEyecatchMeta from '../../assets/default-eyecatch.png';
+import defaultOGPImageMeta from '../../assets/scenery-2025.jpg';
 
 const defaultSite = 'https://aktardigrade13-blog.pages.dev';
 
@@ -17,23 +18,31 @@ const { title, eyecatch } = Astro.props as {
     eyecatch?: string | ImageMetadata;
 };
 
+const pathname = Astro.url.pathname;
+
+// ホームかどうか
+const isHome = pathname === '/';
+
+// まず、デフォルトの fallback を決める
+// ホームなら defaultOGPImageMeta、それ以外は defaultEyecatchMeta
+const fallbackMeta = isHome ? defaultOGPImageMeta : defaultEyecatchMeta;
+
+// 絶対URL化
 const toAbs = (p?: string) => (p ? new URL(p, siteUrl).toString() : undefined);
 
-// OGP用の最終URLを決定
-// 1) string 指定ならその文字列を絶対化
-// 2) ImageMetadata 指定なら .src を絶対化
-// 3) 未指定ならデフォルト ImageMetadata の .src を絶対化
 let ogImageUrl: string | undefined;
 
+// ユーザー指定が string の場合
 if (typeof eyecatch === 'string') {
-    // 文字列（相対/絶対パス）。空文字や空白のみは未指定扱い。
     ogImageUrl = toAbs(eyecatch);
-} else if (eyecatch && typeof eyecatch === 'object' && 'src' in eyecatch) {
-    // ImageMetadata
+}
+// ユーザー指定が ImageMetadata の場合
+else if (eyecatch && typeof eyecatch === 'object' && 'src' in eyecatch) {
     ogImageUrl = toAbs(eyecatch.src);
 }
 
-ogImageUrl = ogImageUrl ?? toAbs(defaultEyecatchMeta.src)!;
+// 未指定なら fallback を適用
+ogImageUrl = ogImageUrl ?? toAbs(fallbackMeta.src)!;
 
 const fullTitle = title ? `${title} - ${siteUrl}` : siteUrl;
 ---
