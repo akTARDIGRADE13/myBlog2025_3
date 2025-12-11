@@ -36,56 +36,68 @@
 }
 
 /*--------------------------------------------
-  Link Card
+  Link Card (remark-link-card-plus)
 --------------------------------------------*/
-.markdown-content .rlc-container {
+
+/* 外側コンテナ：幅・マージンだけ担当 */
+.markdown-content .remark-link-card-plus__container {
+    width:         100%;
+    margin-bottom: var(--spacing-paragraph);
+}
+
+/* カード本体（旧 .rlc-container 相当） */
+.markdown-content .remark-link-card-plus__card {
     display:               grid;
     grid-template-columns: 1fr var(--thumbnail-width);
     gap:                   var(--grid-gap);
     width:                 100%;
-    margin-bottom:         var(--spacing-paragraph);
     border:                var(--border-width-card) solid var(--color-link);
     border-radius:         calc(var(--radius-standard) + var(--radius-offset));
     overflow:              hidden;
     transition:            transform 150ms ease-in-out,
                            background 150ms ease-in-out,
                            border-color 150ms ease-in-out;
+    text-decoration:       none;
+    color:                 inherit;
 }
+
 @media (min-width: 60ch) {
-    .markdown-content .rlc-container {
+    .markdown-content .remark-link-card-plus__card {
         grid-template-columns: 1fr var(--thumbnail-width-wide);
     }
 }
-.markdown-content .rlc-container:hover {
-    background: var(--bg-hover-gradient);
+
+.markdown-content .remark-link-card-plus__card:hover {
+    background:   var(--bg-hover-gradient);
     border-color: var(--color-link);
-    transform: scale(1.03);
+    transform:    scale(1.03);
 }
 
-/* Card Info */
-.markdown-content .rlc-info {
-    grid-column:         1;
-    min-width:           0;
-    padding:             var(--spacing-padding-y) 0 var(--spacing-padding-y) var(--spacing-padding-x);
-    border-radius:       var(--radius-standard) 0 0 var(--radius-standard);
-    display:             flex;
-    flex-direction:      column;
-    justify-content:     center;
+/* Card Info（旧 .rlc-info） */
+.markdown-content .remark-link-card-plus__main {
+    grid-column:    1;
+    min-width:      0;
+    padding:        var(--spacing-padding-y) 0 var(--spacing-padding-y) var(--spacing-padding-x);
+    border-radius:  var(--radius-standard) 0 0 var(--radius-standard);
+    display:        flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 /* Card Info Texts */
-.markdown-content .rlc-title {
-    font-size:       1rem;
-    font-weight:     bold;
-    line-height:     1.3;
-    color:           var(--color-text-primary);
-    display:         -webkit-box;
+.markdown-content .remark-link-card-plus__title {
+    font-size:          1rem;
+    font-weight:        bold;
+    line-height:        1.3;
+    color:              var(--color-text-primary);
+    display:            -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
-    overflow:        hidden;
-    text-overflow:   ellipsis;
+    overflow:           hidden;
+    text-overflow:      ellipsis;
 }
-.markdown-content .rlc-description {
+
+.markdown-content .remark-link-card-plus__description {
     font-size:       0.8rem;
     color:           var(--color-text-secondary);
     margin-bottom:   0.5em;
@@ -93,60 +105,74 @@
     overflow:        hidden;
     text-overflow:   ellipsis;
 }
-.markdown-content .rlc-url-container {
+
+/* URL + favicon（旧 .rlc-url-container） */
+.markdown-content .remark-link-card-plus__meta {
     display:     flex;
     align-items: center;
     gap:         var(--spacing-list-gap);
 }
-.markdown-content .rlc-favicon {
+
+.markdown-content .remark-link-card-plus__favicon {
     margin-top:    0.15rem;
     border-radius: 0.25rem;
 }
-.markdown-content .rlc-url {
+
+.markdown-content .remark-link-card-plus__url {
     font-size:       0.8rem;
     color:           var(--color-url);
     white-space:     nowrap;
     overflow:        hidden;
     text-overflow:   ellipsis;
 }
+
 /* Dark mode overrides for description & URL */
 @media (prefers-color-scheme: dark) {
-    .markdown-content .rlc-description { color: var(--color-desc-dark); }
-    .markdown-content .rlc-url         { color: var(--color-url-dark); }
+    .markdown-content .remark-link-card-plus__description {
+        color: var(--color-desc-dark);
+    }
+    .markdown-content .remark-link-card-plus__url {
+        color: var(--color-url-dark);
+    }
 }
 
-/* Image Container */
-.markdown-content .rlc-image-container {
-    grid-column:       2;
-    min-width:         0;
-    width:             100%;
-    aspect-ratio:      1 / 1;
-    object-fit:        contain;
-    min-height:        100%;
+/* Image Container（旧 .rlc-image-container） */
+.markdown-content .remark-link-card-plus__thumbnail {
+    grid-column:  2;
+    min-width:    0;
+    width:        100%;
+    aspect-ratio: 1 / 1;
+    min-height:   100%;
 }
+
 @media (min-width: 60ch) {
-    .markdown-content .rlc-image-container {
+    .markdown-content .remark-link-card-plus__thumbnail {
         aspect-ratio: 1.91 / 1;
     }
 }
+
 @media (max-width: 40em) {
-    .markdown-content .rlc-image-container {
+    .markdown-content .remark-link-card-plus__thumbnail {
         aspect-ratio: 16 / 9;
     }
-    .markdown-content .rlc-info {
-        padding:       var(--spacing-padding-y) var(--spacing-padding-x);
-        max-height:    20rem;
+
+    .markdown-content .remark-link-card-plus__main {
+        padding:    var(--spacing-padding-y) var(--spacing-padding-x);
+        max-height: 20rem;
     }
-    .markdown-content .rlc-title,
-    .markdown-content .rlc-url {
-        font-size:     0.75rem;
+
+    .markdown-content .remark-link-card-plus__title,
+    .markdown-content .remark-link-card-plus__url {
+        font-size: 0.75rem;
     }
 }
-.markdown-content .rlc-image {
-    display:     block;
-    width:       100%;
-    height:      100%;
-    object-fit:  contain;
+
+/* Image（旧 .rlc-image） */
+.markdown-content .remark-link-card-plus__image {
+    display:    block;
+    width:      100%;
+    height:     100%;
+    object-fit: contain;
 }
 
 /*--------------------------------------------
