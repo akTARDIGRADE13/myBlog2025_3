@@ -2,7 +2,7 @@
 import { defineConfig } from "astro/config";
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import remarkLinkCard from 'remark-link-card'
+import remarkLinkCard from 'remark-link-card-plus'
 import rehypeRaw from 'rehype-raw'
 import rehypeExternalLinks from 'rehype-external-links'
 
