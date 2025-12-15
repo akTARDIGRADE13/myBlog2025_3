@@ -212,8 +212,13 @@
     background-color: var(--color-code-bg, rgba(150,144,255,0.1));
     border-radius: var(--code-border-radius, 0.3em);
     font-family: Consolas, 'Courier New', monospace;
+    color: var(--color-code-text);  
     font-size: var(--font-size-code-inline);
     line-height: 1.4;
+}
+
+.expressive-code {
+    margin: 1.5rem 0;
 }
 
 /*--------------------------------------------

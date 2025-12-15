@@ -8,7 +8,7 @@ import type { ImageMetadata } from 'astro';
 import defaultEyecatchMeta from '../../assets/default-eyecatch.png';
 import defaultOGPImageMeta from '../../assets/scenery-2025.jpg';
 
-const defaultSite = 'https://aktardigrade13-blog.pages.dev';
+const defaultSite = 'https://aktars-blog.com';
 
 const siteValue = (Astro.site ?? defaultSite).toString();
 const siteUrl = siteValue.endsWith('/') ? siteValue.slice(0, -1) : siteValue;
@@ -22,6 +22,8 @@ const pathname = Astro.url.pathname;
 
 // ホームかどうか
 const isHome = pathname === '/';
+
+const siteName = "akTAR.s's Blog";
 
 // まず、デフォルトの fallback を決める
 // ホームなら defaultOGPImageMeta、それ以外は defaultEyecatchMeta
@@ -44,7 +46,7 @@ else if (eyecatch && typeof eyecatch === 'object' && 'src' in eyecatch) {
 // 未指定なら fallback を適用
 ogImageUrl = ogImageUrl ?? toAbs(fallbackMeta.src)!;
 
-const fullTitle = title ? `${title} - ${siteUrl}` : siteUrl;
+const fullTitle = title ? `${title} | ${siteName}` : siteName;
 ---
 
 <!DOCTYPE html>
@@ -53,6 +55,7 @@ const fullTitle = title ? `${title} - ${siteUrl}` : siteUrl;
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{fullTitle}</title>
+        <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/読書のアイコン.png" type="image/png" />
         <link rel="sitemap" href="/sitemap-index.xml" />
 
