@@ -204,31 +204,16 @@
 }
 
 /*--------------------------------------------
-  Inline Code & Code Blocks
+  Inline Code
 --------------------------------------------*/
-.markdown-content code {
-    display: inline-block; 
-    padding: 0.2em 0.4em;    
-    background-color: var(--color-code-bg, rgba(150,144,255,0.1)); 
-    border-radius: var(--code-border-radius, 0.3em);  
-    font-family: Consolas, 'Courier New', monospace; 
-    color: var(--color-code-text);                     
-    font-size: var(--font-size-code-inline); 
-    line-height: 1.4;                           
-    transition: background-color 150ms ease-in-out;
-}
-.markdown-content pre {
-    padding:        1.5rem;
-    border-radius:  var(--radius-standard);
-    overflow-x:     auto;
-    box-shadow:     var(--shadow-code-block);
-    margin:         1.5em 0;
-    line-height: 1.2rem;
-}
-.markdown-content pre code {
-    font-size:     var(--font-size-code-block);
-    padding:       0;
-    background:    none;
+.markdown-content :not(pre) > code {
+    display: inline-block;
+    padding: 0.2em 0.4em;
+    background-color: var(--color-code-bg, rgba(150,144,255,0.1));
+    border-radius: var(--code-border-radius, 0.3em);
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: var(--font-size-code-inline);
+    line-height: 1.4;
 }
 
 /*--------------------------------------------
