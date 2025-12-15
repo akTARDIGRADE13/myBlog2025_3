@@ -13,6 +13,8 @@ import { getOrigQueryParams } from "astro/assets/utils";
 
 import sitemap from "@astrojs/sitemap";
 
+import expressiveCode from "astro-expressive-code";
+
 const katexMacros = {
     "\\quantity": "{\\left\\{ #1 \\right\\}}",
     "\\qty": "{\\left\\{ #1 \\right\\}}",
@@ -134,7 +136,12 @@ const katexMacros = {
 // https://astro.build/config
 export default defineConfig({
     site: "https://aktars-blog.com",
-    integrations: [mdx(), sitemap()],
+    integrations: [expressiveCode(
+        {
+            themes: ["plastic"],
+            defaultProps: { wrap: true },
+        }
+    ), mdx(), sitemap()],
     vite: {
         plugins: [tailwindcss()],
         // windows 側にディレクトリを置いているとき、hot reload が効かないので、以下の設定を追加する
@@ -145,11 +152,6 @@ export default defineConfig({
         // },
     },
     markdown: {
-        shikiConfig: {
-            theme: 'plastic',
-            langs: [],
-            wrap: true,
-        },
         remarkPlugins: [
             remarkMath,
             [ remarkLinkCard, { cache: false, shortenUrl: true }],
