@@ -3,37 +3,36 @@ import Layout from '../../components/Layout/Layout.astro';
 import BlogPostCard from '../../components/BlogPostCard.astro';
 import Pagination from '../../components/Pagination.astro';
 import TagList from '../../components/TagList.astro';
-import type { CollectionEntry } from 'astro:content';
-import { getCollection } from 'astro:content';
+
+import { getMergedPosts } from '../../utils/posts';
 
 const POSTS_PER_PAGE = 10;
-const allPosts: CollectionEntry<'blog'>[] = await getCollection('blog');
 
-// 開発環境ならすべて、ビルド時なら "test_" を含む記事を除外
-const blogPosts = import.meta.env.DEV
-    ? allPosts
-    : allPosts.filter(post => !post.slug.includes('test_') && !post.slug.includes("wip_"));
+const posts = await getMergedPosts();
+const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
 
-blogPosts.sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10));
-const totalPages = Math.ceil(blogPosts.length / POSTS_PER_PAGE);
-
-// 1 ページ目
 const currentPage = 1;
-const startIndex = 0;
-const paginatedPosts = blogPosts.slice(startIndex, POSTS_PER_PAGE);
+const paginatedPosts = posts.slice(0, POSTS_PER_PAGE);
 ---
 
 <Layout title="Blog" description="ブログ一覧">
     <section class="py-4">
-        <!-- TagList コンポーネントに全記事を渡してユニークなタグを表示 -->
-        <TagList posts={blogPosts} />
+        <TagList posts={posts} />
 
-        <h2 class="text-3xl font-bold mb-4">記事一覧（ページ {currentPage} / {totalPages}）</h2>
+        <h2 class="text-3xl font-bold mb-4">
+            記事一覧（ページ {currentPage} / {totalPages}）
+        </h2>
+
         <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {paginatedPosts.map(post => <BlogPostCard post={post} />)}
+            {paginatedPosts.map(post => (
+                <BlogPostCard post={post} />
+            ))}
         </ul>
 
-        {/* ページネーション */}
-        <Pagination currentPage={currentPage} totalPages={totalPages} basePath='/blog' />
+        <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            basePath="/blog"
+        />
     </section>
 </Layout>
