@@ -26,14 +26,15 @@ const toUrl = (v: MaybeUrl | undefined) =>
     typeof v === "string" ? v : v?.src ?? undefined;
 
 const resolvedSrc = toUrl(src);
-const resolvedSources = sources.map(({ src, type }) => ({
-    src: toUrl(src),
-    type,
-}));
-const resolvedTracks = tracks.map(({ src, ...t }) => ({
-    src: toUrl(src),
-    ...t,
-}));
+
+const resolvedSources = [
+    ...(resolvedSrc ? [{ src: resolvedSrc, type: undefined as string | undefined }] : []),
+    ...sources.map(({ src, type }) => ({ src: toUrl(src), type })),
+].filter((s) => !!s.src);
+
+const resolvedTracks = tracks
+    .map(({ src, ...t }) => ({ src: toUrl(src), ...t }))
+    .filter((t) => !!t.src);
 
 const userClass = rest.class;
 delete (rest as any).class;
@@ -42,24 +43,25 @@ delete (rest as any).class;
 <figure class={figureClass}>
     <video
         class:list={["block mx-auto md:max-w-xl lg:max-w-2xl", userClass]}
+        controls
+        playsinline
+        preload="metadata"
         {...rest}
-        src={resolvedSrc}
     >
-        {resolvedSources.map(
-            ({ src, type }) => src && <source src={src} type={type} />
-        )}
-        {resolvedTracks.map(
-            ({ src, kind, srclang, label, default: def }) =>
-                src && (
-                    <track
-                        src={src}
-                        kind={kind}
-                        srclang={srclang}
-                        label={label}
-                        default={def}
-                    />
-            )
-        )}
+        {resolvedSources.map(({ src, type }) => (
+            <source src={src} type={type} />
+        ))}
+
+        {resolvedTracks.map(({ src, kind, srclang, label, default: def }) => (
+            <track
+                src={src}
+                kind={kind}
+                srclang={srclang}
+                label={label}
+                default={def}
+            />
+        ))}
+
         お使いのブラウザは動画に対応していません
     </video>
 
