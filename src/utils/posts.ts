@@ -32,7 +32,7 @@ export async function getMergedPosts(): Promise<UnifiedPost[]> {
 
     const zennRaw = enableZenn ? await fetchZennPosts(zennUser) : [];
 
-    console.log(`[zenn] ${zennRaw.length}`);
+    // console.log(`[zenn] ${zennRaw.length}`);
 
     const zenn: UnifiedPost[] = zennRaw.map((p: ZennPostRaw) => ({
         id: p.id,
