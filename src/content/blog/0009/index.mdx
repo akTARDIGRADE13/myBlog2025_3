@@ -1,0 +1,210 @@
+---
+id: "9"
+title: "競プロ用のライブラリを整備する"
+date: "2026-01-16"
+updated: "2026-01-16"
+eyecatch: "./eyecatch.png"
+tags: ["競技プログラミング"]
+---
+
+
+競プロ（ A & H ）用のライブラリを整備したくなった。
+
+本記事はその備忘録（作業ログ）である。
+
+ライブラリのリポジトリはこちら。
+
+https://github.com/akTARDIGRADE13/cp-library
+
+## 構想
+
+ACL に存在していて、かつ機能的に十分であるもの（例えば セグ木とか）は、そのまま流用したい。
+
+自動 verify 用のツールとして有名なのは [online-judge-tools/verification-helper](https://github.com/online-judge-tools/verification-helper/blob/master/README.ja.md) だと思うが、長らく更新されていない。
+
+他に良さそうなものが無いか探してみたところ、oj の改善版として開発されている [competitive-verifier](https://github.com/competitive-verifier/competitive-verifier) というツールを見つけた。
+
+使用感が oj に似ていること、直近でも更新されていることから、今回はこちらを使用させていただくことにした。
+
+
+## リポジトリ作成
+
+空のリポジトリを作成する。
+
+こちらの [ドキュメント](https://competitive-verifier.github.io/competitive-verifier/installer.ja.html) に従って CI の設定を行う。
+
+`verify.yml` が root 直下に生成されたので、`.github/workflows/` に移動。
+
+ゆきこを利用する場合は `secrets.YUKICODER_TOKEN` が必要なので、「Settings -> Secrets and variables -> Actions -> New repository secret」から追加する。
+
+`YUKICODER_TOKEN` は yukicoder のマイページから取得できる。
+
+
+## formatter の導入
+
+コードフォーマッタとして [clang-format](https://clang.llvm.org/docs/ClangFormat.html) を導入する。
+
+```bash
+sudo apt install clang-format
+```
+
+でインストール可能。
+
+`.clang-format` は、自分の好みを ChatGPT に伝えて生成してもらった。
+
+CI 側で `clang-format` によるフォーマット & push を行うと commit のログが見づらくなりそうなので、ローカルで実行するようにする。
+
+`.git/hooks/pre-commit` に以下のスクリプトをコピペして実行の権限を与えておくと、commit 時に自動でフォーマットしてくれる。
+
+```bash title=".git/hooks/pre-commit"
+#!/bin/bash
+set -e
+
+# clang-format が無ければ何もしない
+if ! command -v clang-format >/dev/null 2>&1; then
+    echo "clang-format not found, skipping format."
+    exit 0
+fi
+
+# 変更された C/C++ ファイルだけ取得
+FILES=$(git diff --cached --name-only --diff-filter=ACM \
+    | grep -E '\.(cpp|cc|cxx|h|hpp)$' || true)
+
+if [ -z "$FILES" ]; then
+    exit 0
+fi
+
+echo "Running clang-format on staged files..."
+
+# フォーマット
+for f in $FILES; do
+    clang-format -i "$f"
+    git add "$f"
+done
+```
+
+## AtCoder Library の導入
+
+自分で実装したプログラムが ACL よりも高速に動作することはまずないと思う。
+
+例えば、セグメント木を用いるアルゴリズム・データ構造を実装する場合、ACL が使えるのであればそれを流用するのが良い（そのようなケースはあまり多くないかもしれないが）。
+
+~~遅延セグ木などの重実装をサボれるのも嬉しい。~~
+
+ACL は今でもたまに更新されているし、将来的に新しいデータ構造やアルゴリズムが追加される可能性もある。
+
+これを踏まえて、ACL の git リポジトリを `git submodule` で管理することにした。[^1]
+
+[^1]: 適当な理由をつけて `git submodule` を使ってみたかっただけなので、こだわりが無ければ普通にコピペで良いと思う。
+
+
+```bash
+$ mkdir third_party
+$ git submodule add git@github.com:atcoder/ac-library.git third_party/acl
+$ git submodule update --init --recursive
+```
+
+`verify.yml` の各ジョブの中でも submodule の初期化を忘れずに行う。
+
+```yml ins={6-7} ins={13-14} ins={"ここは要らないかも？":22-23}
+...
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+...
+  verify:
+...
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+...
+  docs-and-check:
+...
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2147483647
+
+          submodules: recursive
+...
+```
+
+ついでに、ライブラリに関係しないプログラムは最初に削除するようにした。
+
+```yml
+...
+      - name: Prune ACL tests
+        run: |
+          rm -rf third_party/acl/test
+          rm -rf third_party/acl/tools
+          rm -rf third_party/acl/document_en
+          rm -rf third_party/acl/document_ja
+          rm -rf third_party/acl/expander.py
+...
+```
+---
+
+インクルードパスの簡略化のために、シンボリックリンクを貼っておく。
+
+```bash
+$ ln -s third_party/acl/atcoder atcoder
+```
+
+以下のようなファイル構造を考える。
+
+```
+├── a.cpp
+├── cp-library
+│   └── third_party
+│       └── acl
+│           ├── atcoder
+│           └── ...
+└── ...
+```
+
+`a.cpp` の中で ACL を使うときは以下のようにインクルードして、コンパイル時に `-I ./cp-library` を指定する。
+
+```cpp
+#include <atcoder/all>
+```
+
+Windows 環境（ ≠ WSL ）だとシンボリックリンクは使えないかも？ `-I cp-library\third_party\acl` とすれば良さそう、多分。
+
+
+## コンパイルオプション
+
+[公式の仕様書](https://competitive-verifier.github.io/competitive-verifier/document.ja.html) に
+
+> config.toml というファイルを作って以下のように設定を書くと、コンパイラやそのオプションを指定できます。
+
+とあるので、とりあえず root 直下に `config.toml` を作成したが、読み込まれなかった。
+
+oj のほうだと `.verify-helper/` の下に `config.toml` を置いていたような気がしたので合わせてみるが、結果は変わらず。
+
+頭を抱えながら `competitive-verifier` のリポジトリを眺めていると、`verify.yml` の中に
+
+```yml
+ - name: oj-resolve
+        uses: competitive-verifier/actions/oj-resolve@v2
+        with:
+          output-path: verify_files.json
+          # Specify patterns
+          # include: your-own-include/
+          # exclude: your-own-exclude/
+          # If you have config.toml
+          # config: .verify-helper/config.toml
+```
+
+を発見。見落としてた～。
+
+コメントアウトを外して解決。
+
+## おわり
+
+Github Pages のデザインをカスタマイズできないか模索していたけど、ちゃんと個性を出したいなら fork してがっつり改造するとかしないといけなさそうなので、一旦断念。
+
+とりあえず入れ物は用意したので、時間があるときに少しずつ充実させていきたい。
