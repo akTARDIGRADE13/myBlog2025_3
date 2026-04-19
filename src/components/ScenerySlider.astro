@@ -1,0 +1,113 @@
+---
+type ImageItem = {
+    src: string;
+    alt?: string;
+};
+
+interface Props {
+    images: ImageItem[];
+}
+
+const { images } = Astro.props;
+const sliderId = 'scenery-slider';
+---
+
+<div id={sliderId} class="w-full">
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
+        <div class="slider-stage relative aspect-[4/3] w-full cursor-pointer bg-gray-100">
+            {images.map((image, index) => (
+                <img
+                    src={image.src}
+                    alt={image.alt ?? `scenery-${index + 1}`}
+                    class:list={[
+                        'slider-image absolute inset-0 h-full w-full object-cover transition-all duration-[1600ms] ease-in-out will-change-[opacity,transform]',
+                        index === 0 ? 'scale-100 opacity-100' : 'pointer-events-none scale-[1.02] opacity-0',
+                    ]}
+                    data-index={index}
+                />
+            ))}
+
+            <div class="pointer-events-none absolute inset-y-0 left-0 w-1/2"></div>
+            <div class="pointer-events-none absolute inset-y-0 right-0 w-1/2"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (() => {
+        const root = document.getElementById('scenery-slider');
+        if (!root) return;
+
+        const stage = root.querySelector('.slider-stage');
+        const images = Array.from(root.querySelectorAll('.slider-image'));
+
+        if (!stage || images.length === 0) return;
+
+        let currentIndex = 0;
+        let intervalId = null;
+        const autoplayMs = 5000;
+
+        const render = () => {
+            images.forEach((image, index) => {
+                if (index === currentIndex) {
+                    image.classList.remove('opacity-0', 'scale-[1.02]', 'pointer-events-none');
+                    image.classList.add('opacity-100', 'scale-100');
+                } else {
+                    image.classList.remove('opacity-100', 'scale-100');
+                    image.classList.add('opacity-0', 'scale-[1.02]', 'pointer-events-none');
+                }
+            });
+        };
+
+        const goTo = (index) => {
+            currentIndex = (index + images.length) % images.length;
+            render();
+        };
+
+        const next = () => {
+            goTo(currentIndex + 1);
+        };
+
+        const prev = () => {
+            goTo(currentIndex - 1);
+        };
+
+        const stopAutoplay = () => {
+            if (intervalId !== null) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        };
+
+        const startAutoplay = () => {
+            stopAutoplay();
+            intervalId = setInterval(() => {
+                next();
+            }, autoplayMs);
+        };
+
+        const restartAutoplay = () => {
+            startAutoplay();
+        };
+
+        stage.addEventListener('click', (event) => {
+            const rect = stage.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const isLeftSide = clickX < rect.width / 2;
+
+            if (isLeftSide) {
+                prev();
+            } else {
+                next();
+            }
+
+            restartAutoplay();
+        });
+
+        root.addEventListener('mouseenter', stopAutoplay);
+        root.addEventListener('mouseleave', startAutoplay);
+
+        render();
+        startAutoplay();
+    })();
+</script>
