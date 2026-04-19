@@ -115,9 +115,9 @@ const previewSiteLabel =
 
 {data ? (
     <div class={`book-card max-w-xl mx-auto bg-white rounded-xl shadow-sm p-4 sm:p-5 border ${borderClass} mb-4 last:mb-0`}>
-        <div class="flex flex-col gap-4 sm:flex-row sm:gap-4">
-            <div class="flex gap-4 sm:block sm:w-28 sm:shrink-0">
-                <div class="shrink-0">
+        <div class="flex items-start gap-4">
+            <div class="w-24 shrink-0 sm:w-28">
+                <div>
                     {previewImageUrl ? (
                         previewHref ? (
                             <a
@@ -160,7 +160,7 @@ const previewSiteLabel =
                         href={previewHref ?? previewLink.url}
                         target="_blank"
                         rel="noreferrer"
-                        class="book-card-link mt-1 inline-block break-words text-[0.72rem] text-gray-400 no-underline transition hover:text-gray-600"
+                        class="book-card-link mt-2 block break-words text-[0.72rem] text-gray-400 no-underline transition hover:text-gray-600"
                     >
                         {previewSiteLabel}
                     </a>
