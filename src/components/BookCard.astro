@@ -2,6 +2,13 @@
 import type { CoverSource, BiblioSource, BookCardData } from "../types/book";
 import { getBookCardData } from "../utils/book-api";
 import { getNdcLabelFromCode } from "../utils/ndc";
+import { fetchOgp, type OgpData } from "../utils/ogp";
+
+interface BookExternalLink {
+    label: string;
+    url: string;
+    preview?: boolean;
+}
 
 interface Props {
     isbn: string;
@@ -14,6 +21,7 @@ interface Props {
         | "emerald" | "green" | "lime" | "yellow"
         | "amber" | "orange" | "red";
     authorOverride?: string;
+    links?: BookExternalLink[];
 }
 
 const {
@@ -22,6 +30,7 @@ const {
     biblioSource = "openbd",
     borderColor = "neutral",
     authorOverride,
+    links = [],
 } = Astro.props as Props;
 
 const data: BookCardData | null = await getBookCardData(isbn, {
@@ -56,17 +65,11 @@ const borderClassMap: Record<NonNullable<Props["borderColor"]>, string> = {
 
 const borderClass = borderClassMap[borderColor];
 
-/**
- * 表示用に ISBN を正規化する
- * - JP-e サフィックス (.jp-e) が付いていても OK
- * - 13桁の数字（+X）だけに統一（ハイフン等除去）
- * - 13桁じゃなければ元の文字列をそのまま返す
- */
 function normalizeIsbn13Display(isbnRaw: string): string {
     const cleaned = isbnRaw
         .toLowerCase()
-        .replace(/\.jp-e$/, "")       // JP-e サフィックスを削る
-        .replace(/[^0-9x]/g, "");     // 数字と x/X 以外を削除
+        .replace(/\.jp-e$/, "")
+        .replace(/[^0-9x]/g, "");
 
     if (cleaned.length === 13) {
         return cleaned;
@@ -74,44 +77,109 @@ function normalizeIsbn13Display(isbnRaw: string): string {
     return isbnRaw;
 }
 
+function getHostname(url: string): string {
+    try {
+        return new URL(url).hostname.replace(/^www\./, "");
+    } catch {
+        return url;
+    }
+}
+
 const displayIsbn = data ? normalizeIsbn13Display(data.isbn) : "";
 
-// 著者表示用テキスト
 const authorsFromData = data?.authors ?? [];
 const authorsDisplay =
     authorOverride && authorOverride.trim().length > 0
         ? authorOverride.trim()
         : (authorsFromData.length ? authorsFromData.join(" / ") : "不明");
 
-// NDC 表示用
 const ndcLabel = data?.ndc ? getNdcLabelFromCode(data.ndc) : undefined;
+
+const previewLink =
+    links.find((link) => link.preview) ??
+    links[0];
+
+const previewOgp: OgpData | null = previewLink
+    ? await fetchOgp(previewLink.url)
+    : null;
+
+const previewImageUrl = previewLink
+    ? (previewOgp?.image ?? null)
+    : (data?.coverUrl ?? null);
+
+const previewHref = previewLink?.url ?? data?.ndlLink ?? null;
+const previewAlt = previewOgp?.title ?? data?.title ?? "book preview";
+const previewSiteLabel =
+    previewOgp?.siteName ?? (previewLink ? getHostname(previewLink.url) : null);
 ---
 
 {data ? (
-    <div class={`max-w-xl mx-auto bg-white rounded-xl shadow-sm p-5 border ${borderClass} mb-4 last:mb-0`}>
-        <div class="flex gap-4">
-            {data.coverUrl && (
-                <img
-                    src={data.coverUrl}
-                    alt={data.title}
-                    class="w-24 h-auto rounded-md shadow-sm object-contain bg-gray-50"
-                    loading="lazy"
-                />
-            )}
+    <div class={`book-card max-w-xl mx-auto bg-white rounded-xl shadow-sm p-4 sm:p-5 border ${borderClass} mb-4 last:mb-0`}>
+        <div class="flex flex-col gap-4 sm:flex-row sm:gap-4">
+            <div class="flex gap-4 sm:block sm:w-28 sm:shrink-0">
+                <div class="shrink-0">
+                    {previewImageUrl ? (
+                        previewHref ? (
+                            <a
+                                href={previewHref}
+                                target="_blank"
+                                rel="noreferrer"
+                                class="book-card-image-link block"
+                            >
+                                <img
+                                    src={previewImageUrl}
+                                    alt={previewAlt}
+                                    class="h-36 w-24 rounded-md border border-gray-100 bg-gray-50 object-cover shadow-sm sm:h-40 sm:w-28"
+                                    loading="lazy"
+                                />
+                            </a>
+                        ) : (
+                            <img
+                                src={previewImageUrl}
+                                alt={previewAlt}
+                                class="h-36 w-24 rounded-md border border-gray-100 bg-gray-50 object-cover shadow-sm sm:h-40 sm:w-28"
+                                loading="lazy"
+                            />
+                        )
+                    ) : previewLink ? (
+                        <a
+                            href={previewHref ?? previewLink.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            class="flex h-36 w-24 items-center justify-center rounded-md border border-gray-200 bg-gray-50 p-2 text-center text-[0.72rem] leading-4 text-gray-500 transition hover:border-teal-300 hover:bg-teal-50 sm:h-40 sm:w-28"
+                        >
+                            {previewSiteLabel ?? "external link"}
+                        </a>
+                    ) : (
+                        <div class="h-36 w-24 rounded-md border border-gray-200 bg-gray-50 sm:h-40 sm:w-28" />
+                    )}
+                </div>
 
-            <div class="flex-1">
-                {/* タイトル行 */}
-                <div class="flex items-center gap-3">
-                    <div class="w-1.5 h-6 rounded-full bg-teal-400"></div>
-                    <div class="book-card-title">
-                        {data.title}
+                {previewLink && previewSiteLabel && (
+                    <a
+                        href={previewHref ?? previewLink.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        class="book-card-link mt-1 inline-block break-words text-[0.72rem] text-gray-400 no-underline transition hover:text-gray-600"
+                    >
+                        {previewSiteLabel}
+                    </a>
+                )}
+            </div>
+
+            <div class="min-w-0 flex-1">
+                <div class="flex items-start gap-3">
+                    <div class="mt-1 h-6 w-1.5 shrink-0 rounded-full bg-teal-400"></div>
+                    <div class="min-w-0">
+                        <div class="book-card-title">
+                            {data.title}
+                        </div>
                     </div>
                 </div>
 
-                {/* メタ情報 */}
                 <div class="mt-3 space-y-2 text-sm">
                     <div class="flex gap-2">
-                        <span class="text-gray-500 min-w-[3rem]">著者</span>
+                        <span class="min-w-[3rem] text-gray-500">著者</span>
                         <span class="text-gray-900">
                             {authorsDisplay}
                         </span>
@@ -119,21 +187,21 @@ const ndcLabel = data?.ndc ? getNdcLabelFromCode(data.ndc) : undefined;
 
                     {data.publisher && (
                         <div class="flex gap-2">
-                            <span class="text-gray-500 min-w-[3rem]">出版社</span>
+                            <span class="min-w-[3rem] text-gray-500">出版社</span>
                             <span class="text-gray-900">{data.publisher}</span>
                         </div>
                     )}
 
                     {data.pubdate && (
                         <div class="flex gap-2">
-                            <span class="text-gray-500 min-w-[3rem]">出版日</span>
+                            <span class="min-w-[3rem] text-gray-500">出版日</span>
                             <span class="text-gray-900">{data.pubdate}</span>
                         </div>
                     )}
 
                     {data.ndc && (
                         <div class="flex gap-2">
-                            <span class="text-gray-500 min-w-[3rem]">分類</span>
+                            <span class="min-w-[3rem] text-gray-500">分類</span>
                             <span class="text-gray-900">
                                 {ndcLabel ?? data.ndc}
                                 {" "}
@@ -143,24 +211,41 @@ const ndcLabel = data?.ndc ? getNdcLabelFromCode(data.ndc) : undefined;
                     )}
                 </div>
 
-                {/* ISBN */}
-                {displayIsbn && (
-                    <div class="mt-3 flex justify-end">
-                        <span class="text-[0.75rem] text-gray-400 tracking-wide">
+                <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div class="flex flex-wrap gap-2">
+                        {links.map((link) => (
+                            <a
+                                href={link.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                class:list={[
+                                    "book-card-button inline-flex items-center justify-center rounded-full border px-3 py-1.5 text-xs font-medium whitespace-nowrap no-underline transition",
+                                    link === previewLink
+                                        ? "border-gray-300 bg-gray-50 text-gray-500 hover:bg-gray-100"
+                                        : "border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800",
+                                ]}
+                            >
+                                {link.label}で見る
+                            </a>
+                        ))}
+                    </div>
+
+                    {displayIsbn && (
+                        <span class="text-[0.75rem] tracking-wide text-gray-400 sm:shrink-0 sm:text-right">
                             ISBN {displayIsbn}
                         </span>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
 
-        {data.ndlLink && (
+        {links.length === 0 && data.ndlLink && (
             <div class="mt-3 text-right">
                 <a
                     href={data.ndlLink}
                     target="_blank"
                     rel="noreferrer"
-                    class="text-xs font-medium text-teal-600 hover:text-teal-800 transition"
+                    class="text-xs font-medium text-teal-600 transition hover:text-teal-800"
                 >
                     国立国会図書館で見る →
                 </a>
