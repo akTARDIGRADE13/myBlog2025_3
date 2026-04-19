@@ -178,13 +178,14 @@
 /*--------------------------------------------
   Links & Emphasis
 --------------------------------------------*/
-.markdown-content a {
-    color:            var(--color-link);
-    text-decoration:  none;
-    border-bottom:    1px solid var(--color-link);
-    transition:       color 150ms ease-in-out;
+.markdown-content a:not(.book-card-link):not(.book-card-button):not(.book-card-image-link) {
+    color: var(--color-link);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-link);
+    transition: color 150ms ease-in-out;
 }
-.markdown-content a:hover {
+
+.markdown-content a:not(.book-card-link):not(.book-card-button):not(.book-card-image-link):hover {
     color: var(--color-link-hover);
 }
 .markdown-content em {
