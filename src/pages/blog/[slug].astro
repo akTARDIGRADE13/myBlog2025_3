@@ -1,31 +1,36 @@
 ---
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
-import type { CollectionEntry } from 'astro:content';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
-	const posts: CollectionEntry<'blog'>[] = await getCollection('blog');
-	return posts.map((post) => ({
-		params: { slug: post.id },
-		props: { post }
-	}));
+    const posts = await getCollection('blog');
+
+    return posts.map((post) => ({
+        params: { slug: post.id }
+    }));
 }
 
 const { slug } = Astro.params;
-const { post } = Astro.props as { post: CollectionEntry<'blog'> };
 
-if (!post) {
-	throw new Error(`記事が見つかりません: ${slug}`);
+if (!slug) {
+    throw new Error('slug が指定されていません');
 }
 
-const { Content } = await post.render();
+const posts = await getCollection('blog');
+const post = posts.find((p) => p.id === slug);
+
+if (!post) {
+    throw new Error(`記事が見つかりません: ${slug}`);
+}
+
+const { Content } = await render(post);
 ---
 
-<ArticleLayout 
-	title={post.data.title} 
-	date={post.data.date} 
-	updated={post.data.updated}
-	eyecatch={post.data.eyecatch}>
-	<!-- Markdown 記事のコンテンツ -->
-	<Content />
+<ArticleLayout
+    title={post.data.title}
+    date={post.data.date}
+    updated={post.data.updated}
+    eyecatch={post.data.eyecatch}
+>
+    <Content />
 </ArticleLayout>
