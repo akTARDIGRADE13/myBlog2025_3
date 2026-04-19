@@ -13,7 +13,7 @@ export async function getMergedPosts(): Promise<UnifiedPost[]> {
 
     const localSource = import.meta.env.DEV
         ? all
-        : all.filter(p => !p.slug.includes("test_") && !p.slug.includes("wip_"));
+        : all.filter(p => !(p.id ?? "").includes("test_") && !(p.id ?? "").includes("wip_"));
 
     const local: UnifiedPost[] = localSource.map(post => ({
         id: post.id,
@@ -21,7 +21,7 @@ export async function getMergedPosts(): Promise<UnifiedPost[]> {
         date: toDate(post.data.date),
         updated: post.data.updated ? toDate(post.data.updated) : undefined,
         tags: post.data.tags ?? [],
-        href: `/blog/${post.slug}`,
+        href: `/blog/${post.id}`,
         source: "local",
         description: "",
         eyecatch: post.data.eyecatch,
