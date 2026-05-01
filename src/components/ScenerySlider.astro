@@ -29,6 +29,21 @@ const sliderId = 'scenery-slider';
 
             <div class="pointer-events-none absolute inset-y-0 left-0 w-1/2"></div>
             <div class="pointer-events-none absolute inset-y-0 right-0 w-1/2"></div>
+
+            <div class="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-center bg-black/35 px-4 py-3">
+                <div class="flex items-center gap-2">
+                    {images.map((_, index) => (
+                        <span
+                            class:list={[
+                                'slider-dot h-2.5 w-2.5 rounded-full transition-all duration-300',
+                                index === 0 ? 'w-6 bg-white' : 'bg-white/45',
+                            ]}
+                            data-index={index}
+                            aria-hidden="true"
+                        ></span>
+                    ))}
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -40,6 +55,7 @@ const sliderId = 'scenery-slider';
 
         const stage = root.querySelector('.slider-stage');
         const images = Array.from(root.querySelectorAll('.slider-image'));
+        const dots = Array.from(root.querySelectorAll('.slider-dot'));
 
         if (!stage || images.length === 0) return;
 
@@ -55,6 +71,16 @@ const sliderId = 'scenery-slider';
                 } else {
                     image.classList.remove('opacity-100', 'scale-100');
                     image.classList.add('opacity-0', 'scale-[1.02]', 'pointer-events-none');
+                }
+            });
+
+            dots.forEach((dot, index) => {
+                if (index === currentIndex) {
+                    dot.classList.remove('w-2.5', 'bg-white/45');
+                    dot.classList.add('w-6', 'bg-white');
+                } else {
+                    dot.classList.remove('w-6', 'bg-white');
+                    dot.classList.add('w-2.5', 'bg-white/45');
                 }
             });
         };
@@ -103,9 +129,6 @@ const sliderId = 'scenery-slider';
 
             restartAutoplay();
         });
-
-        root.addEventListener('mouseenter', stopAutoplay);
-        root.addEventListener('mouseleave', startAutoplay);
 
         render();
         startAutoplay();
