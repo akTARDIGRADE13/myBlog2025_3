@@ -103,10 +103,14 @@ const previewOgp: OgpData | null = previewLink
     ? await fetchOgp(previewLink.url)
     : null;
 
-const previewImageUrl =
-    previewOgp?.image ??
-    data?.coverUrl ??
-    null;
+const previewImageUrl = previewOgp?.image ?? null;
+
+console.log("[BookCard] preview", {
+    isbn,
+    previewUrl: previewLink?.url,
+    previewOgp,
+    previewImageUrl,
+});
 
 const previewHref = previewLink?.url ?? data?.ndlLink ?? null;
 const previewAlt = previewOgp?.title ?? data?.title ?? "book preview";
