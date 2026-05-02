@@ -4,6 +4,7 @@ export interface OgpData {
     description?: string;
     image?: string;
     siteName?: string;
+    fetchedAt?: string;
 }
 
 type MetaAttr = "property" | "name";
@@ -46,13 +47,10 @@ function pickMetaByAttr(
     const escapedKey = escapeRegExp(key);
 
     const patterns = [
-        // <meta property="og:image" content="...">
         new RegExp(
             `<meta\\b[^>]*\\b${attr}\\s*=\\s*["']${escapedKey}["'][^>]*\\bcontent\\s*=\\s*["']([^"']*)["'][^>]*>`,
             "i",
         ),
-
-        // <meta content="..." property="og:image">
         new RegExp(
             `<meta\\b[^>]*\\bcontent\\s*=\\s*["']([^"']*)["'][^>]*\\b${attr}\\s*=\\s*["']${escapedKey}["'][^>]*>`,
             "i",
@@ -116,6 +114,51 @@ function getHostname(url: string): string | undefined {
     }
 }
 
+export function parseOgp(html: string, baseUrl: string): OgpData | null {
+    const title =
+        pickMeta(html, [
+            "og:title",
+            "twitter:title",
+        ]) ??
+        pickTitle(html);
+
+    const description =
+        pickMeta(html, [
+            "og:description",
+            "twitter:description",
+            "description",
+        ]);
+
+    const rawImage = pickMeta(html, [
+        "og:image",
+        "og:image:url",
+        "og:image:secure_url",
+        "twitter:image",
+        "twitter:image:src",
+    ]);
+
+    const image = toAbsoluteUrl(baseUrl, rawImage);
+
+    const siteName =
+        pickMeta(html, [
+            "og:site_name",
+            "twitter:site",
+        ]) ??
+        getHostname(baseUrl);
+
+    if (!title && !description && !image) {
+        return null;
+    }
+
+    return {
+        url: baseUrl,
+        title,
+        description,
+        image,
+        siteName,
+    };
+}
+
 export async function fetchOgp(url: string): Promise<OgpData | null> {
     try {
         const response = await fetch(url, {
@@ -162,40 +205,9 @@ export async function fetchOgp(url: string): Promise<OgpData | null> {
         }
 
         const html = await response.text();
+        const ogp = parseOgp(html, finalUrl);
 
-        const title =
-            pickMeta(html, [
-                "og:title",
-                "twitter:title",
-            ]) ??
-            pickTitle(html);
-
-        const description =
-            pickMeta(html, [
-                "og:description",
-                "twitter:description",
-                "description",
-            ]);
-
-        const rawImage = pickMeta(html, [
-            "og:image",
-            "og:image:url",
-            "og:image:secure_url",
-            "twitter:image",
-            "twitter:image:src",
-        ]);
-
-        const image = toAbsoluteUrl(finalUrl, rawImage);
-
-        const siteName =
-            pickMeta(html, [
-                "og:site_name",
-                "twitter:site",
-            ]) ??
-            getHostname(finalUrl) ??
-            getHostname(url);
-
-        if (!title && !description && !image) {
+        if (!ogp) {
             console.warn("[fetchOgp] no ogp-like fields found", {
                 url,
                 finalUrl,
@@ -207,11 +219,8 @@ export async function fetchOgp(url: string): Promise<OgpData | null> {
         }
 
         return {
-            url: finalUrl,
-            title,
-            description,
-            image,
-            siteName,
+            ...ogp,
+            fetchedAt: new Date().toISOString(),
         };
     } catch (error) {
         console.error("[fetchOgp] failed", {
@@ -220,5 +229,15 @@ export async function fetchOgp(url: string): Promise<OgpData | null> {
         });
 
         return null;
+    }
+}
+
+export function normalizeOgpUrl(url: string): string {
+    try {
+        const normalizedUrl = new URL(url);
+        normalizedUrl.hash = "";
+        return normalizedUrl.toString();
+    } catch {
+        return url;
     }
 }
