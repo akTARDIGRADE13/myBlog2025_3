@@ -228,6 +228,21 @@
     color: var(--color-link-hover);
     border-color: var(--color-link-hover);
 }
+.markdown-content em {
+    font-style: italic;
+    color:      var(--color-text-em);
+}
+.markdown-content strong {
+    font-weight: 600;
+    color:      var(--color-text-strong);
+    background: linear-gradient(transparent 60%, var(--color-text-strong-bg) 60%);
+}
+.markdown-content mark {
+    background-color: var(--color-link);
+    color:            #fff;
+    padding:          0.1em 0.2em;
+    border-radius:    var(--radius-standard);
+}
 
 /*--------------------------------------------
   Inline Code
