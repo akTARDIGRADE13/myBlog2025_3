@@ -154,7 +154,7 @@ export default defineConfig({
     markdown: {
         remarkPlugins: [
             remarkMath,
-            [ remarkLinkCard, { cache: false, shortenUrl: true }],
+            [ remarkLinkCard, { cache: true, shortenUrl: true }],
         ],
         rehypePlugins: [
             [rehypeKatex, { macros: katexMacros }],
