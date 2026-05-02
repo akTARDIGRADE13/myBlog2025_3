@@ -7,7 +7,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "build:ndc": "node scripts/build-ndc-map.mjs"
+    "build:ndc": "node scripts/build-ndc-map.mjs",
+    "update:ogp-cache": "node scripts/update-ogp-cache.mjs"
   },
   "dependencies": {
     "@astro-community/astro-embed-youtube": "^0.5.6",

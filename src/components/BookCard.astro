@@ -2,7 +2,8 @@
 import type { CoverSource, BiblioSource, BookCardData } from "../types/book";
 import { getBookCardData } from "../utils/book-api";
 import { getNdcLabelFromCode } from "../utils/ndc";
-import { fetchOgp, type OgpData } from "../utils/ogp";
+import type { OgpData } from "../utils/ogp";
+import { fetchBooklogOgp } from "../utils/booklog-ogp";
 
 interface BookExternalLink {
     label: string;
@@ -100,17 +101,17 @@ const previewLink =
     links[0];
 
 const previewOgp: OgpData | null = previewLink
-    ? await fetchOgp(previewLink.url)
+    ? await fetchBooklogOgp(previewLink.url)
     : null;
 
 const previewImageUrl = previewOgp?.image ?? null;
 
-console.log("[BookCard] preview", {
-    isbn,
-    previewUrl: previewLink?.url,
-    previewOgp,
-    previewImageUrl,
-});
+// console.log("[BookCard] preview", {
+//     isbn,
+//     previewUrl: previewLink?.url,
+//     previewOgp,
+//     previewImageUrl,
+// });
 
 const previewHref = previewLink?.url ?? data?.ndlLink ?? null;
 const previewAlt = previewOgp?.title ?? data?.title ?? "book preview";
