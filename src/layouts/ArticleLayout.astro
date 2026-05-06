@@ -7,9 +7,10 @@ export interface Props {
     date: string;
     updated?: string;
     eyecatch?: string;
+    tags? : string[];
 }
 
-const { title, date, updated, eyecatch } = Astro.props;
+const { title, date, updated, eyecatch, tags } = Astro.props;
 ---
 
 <Layout title={title} eyecatch={eyecatch}>
@@ -23,6 +24,21 @@ const { title, date, updated, eyecatch } = Astro.props;
             <>（最終更新日：{new Date(updated).toLocaleDateString('ja-JP')}）</>
             ) : null}
         </p>
+
+        {tags.length > 0 && (
+                <ul class="mt-4 flex flex-wrap justify-center gap-2">
+                    {tags.map((tag) => (
+                        <li>
+                            <a
+                                href={`/blog/tags/${encodeURIComponent(tag)}`}
+                                class="inline-flex items-center rounded-full border border-gray-300 px-3 py-1 text-sm text-gray-600 transition hover:border-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                            >
+                                {tag}
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
         <!-- 記事本文 -->
         <div class="prose prose-sm sm:prose-lg max-w-none markdown-content">
