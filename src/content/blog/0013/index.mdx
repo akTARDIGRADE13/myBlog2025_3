@@ -1,0 +1,210 @@
+---
+id: "13"
+title: "Ubuntu PC でコーディング環境を整える"
+date: "2026-05-04"
+updated: "2026-05-04"
+eyecatch: "./eyecatch.png"
+tags: ["Ubuntu 移行記録 2026", "Ubuntu", "Linux", "chezmoi", "fcitx", "AstroNvim"]
+---
+
+import Figure from "../../../components/Figure.astro";
+import ubuntu_desktop from "./ubuntu_desktop.jpg"
+
+# はじめに
+
+本記事は、下の記事の続きです。
+
+https://aktars-blog.com/blog/0012/
+
+<br/>
+---
+<br/>
+
+- [1. Windows から Ubuntu へ移行した記録](https://aktars-blog.com/blog/0011/)
+- [2. chezmoi を用いて dotfiles を管理する](https://aktars-blog.com/blog/0012/)
+- **[3. Ubuntu PC のコーディング環境を整える](https://aktars-blog.com/blog/0013/)**　　　　　⬅ｲﾏｺｺ
+
+
+## 本記事の内容
+
+本記事では、 Ubuntu PC で実際にシェル・コーディング環境を構築した際の手順をまとめます。
+
+ChatGPT と話し合いながら作業を進めたのですが、多分無駄な工程が存在しています。
+
+以下は、自分が実際に使っている dotfiles のリポジトリを公開用に整えたものです。本記事中の `akTARDIGRADE13/dotfiles` を上のリポジトリに置き換えることで、自分の環境と同じものを再現できると思います。
+
+https://github.com/akTARDIGRADE13/dotfiles_public
+
+**chezmoi で展開すると、既存の設定ファイルが上書きされる可能性があります。**
+
+**実際に試す際は、事前にバックアップを取ることを強くおすすめします。**
+
+また、`dot_gitconfig` の内容が次のようになっている点に留意してください。
+
+```ini title="git_config"
+[user]
+	name = ****
+	email = ****
+[core]
+	editor = vim
+[init]
+	defaultBranch = main
+```
+
+# 環境構築
+
+一切なにも入っていない所からのスタートです。
+
+ほぼ作業ログです。
+
+## 1. 必要なパッケージを入れる
+
+```zsh
+$ sudo apt update
+$ sudo apt install -y \
+    curl \
+    git \
+    unzip \
+    tar \
+    build-essential \
+    pkg-config \
+    libssl-dev \
+    ripgrep \
+    fd-find \
+    sqlite3 \
+    xclip \
+    python3 \
+    python3-pip \
+    python3-pynvim \
+    zsh
+```
+
+## 2. Rust / cargo を入れる
+
+Sheldon と StarShip は Rust 製のツールであるため、Rust / cargo を入れる必要があります。
+
+```zsh
+$ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+## 3. Sheldon を入れる
+
+
+```zsh
+$ cargo install sheldon
+```
+
+## 4. StarShip を入れる
+
+```zsh
+$ curl -sS https://starship.rs/install.sh | sh
+```
+
+## 5. chezmoi を入れる
+
+```zsh
+$ sh -c "$(curl -fsLS get.chezmoi.io)"
+```
+
+## 6. dotfiles を展開する
+
+```zsh
+$ chezmoi init git@github.com:akTARDIGRADE13/dotfiles.git
+$ chezmoi apply
+```
+
+## 7. zsh をデフォルトシェルにする
+
+```zsh
+$ chsh -s "$(which zsh)"
+```
+
+恐らくこのタイミングで日本語入力ができなくなってしまった。謎。
+
+あとで直します。
+
+## 8. nvm を入れる
+
+
+```zsh
+$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+$ source ~/.zshrc
+```
+
+## 9. Node.js を入れる
+
+```zsh
+$ nvm install --lts
+$ nvm alias default 'lts/*'
+```
+
+## 10. Neovim 用の Node provider を入れる
+
+```zsh
+$ npm install -g neovim
+```
+
+## 11. chezmoi をもう一度 apply する
+
+ChatGPT にやれと言われたのでやったけど、多分要らなかった。
+
+```zsh
+$ chezmoi apply
+```
+
+## 12. Neovim を起動する
+
+初回の起動時にプラグインがまとめてインストールされます。
+
+```zsh
+$ nvim
+```
+
+## 13. フォントを Firple にする
+
+フォントをダウンロードする。
+
+https://negset.com/Firple/
+
+```zsh
+$ mkdir -p ~/.local/share/fonts/Firple
+$ find ~/Downloads/firple -type f \( -name "*.ttf" -o -name "*.otf" \) -exec cp {} ~/.local/share/fonts/Firple/ \;
+$ fc-cache -fv
+```
+
+あとはターミナルの設定からフォントを Firple に変更すればOK。
+
+# 日本語が入力できなくなった
+
+しばらく気づかなかったんですが、多分 zsh をデフォルトにしたタイミングで日本語入力ができなくなりました。
+
+[最初の記事](https://aktars-blog.com/blog/0011/)で書いた通り、入力メソッドは `fcitx + mozc` を採用しています。
+
+`fcitx` か `mozc` が消えれば当然日本語入力ができなくなるのですが、調べるとどちらも残っていそう。
+
+`fcitx` が起動していないみたいだったので、これを手動で立ち上げてみると日本語入力ができるようになりました。
+
+どうやら、 **「PC を起動したときに `fcitx` が自動で立ち上がらない」** 設定に変わってしまったようです。なんで～。
+
+原因はよくわかりませんが、ログイン時に自動で立ち上げるような設定を書けば解決しそうです。
+
+調べると、「それはできます」という記事が見つかるので、それに従って設定をしました。
+
+https://qiita.com/ntrlmt/items/7006f68e668cb13e02db
+
+```ini title="~/.config/autostart/fcitx5.desktop"
+[Desktop Entry]
+Type=Application
+Name=Fcitx5
+Comment=Start Fcitx5 input method
+Exec=fcitx5 -d
+Icon=fcitx
+Terminal=false
+X-GNOME-Autostart-enabled=true
+```
+
+# 終わり
+
+無事に環境構築ができたので終わります。
+
+3 部作、完。

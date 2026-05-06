@@ -1,0 +1,253 @@
+---
+id: "12"
+title: "chezmoi を用いて dotfiles を管理する"
+date: "2026-05-04"
+updated: "2026-05-04"
+eyecatch: "./eyecatch.png"
+tags: ["Ubuntu 移行記録 2026", "Ubuntu", "Linux", "WSL", "chezmoi", "zsh", "AstroNvim"]
+---
+
+import Figure from "../../../components/Figure.astro";
+import Video from "../../../components/Video.astro";
+import ubuntu_desktop from "./ubuntu_desktop.jpg";
+import zsh from "./zsh.mp4";
+import astronvim from "./astronvim.mp4";
+
+# はじめに
+
+本記事は、下の記事の続きです。
+
+https://aktars-blog.com/blog/0011/
+
+<br/>
+---
+<br/>
+
+- [1. Windows から Ubuntu へ移行した記録](https://aktars-blog.com/blog/0011/)
+- **[2. chezmoi を用いて dotfiles を管理する](https://aktars-blog.com/blog/0012/)**　　　　　⬅ｲﾏｺｺ
+- [3. Ubuntu PC のコーディング環境を整える](https://aktars-blog.com/blog/0013/)
+
+## 本記事の内容
+
+本記事では chezmoi の簡単な紹介と、自分が求めるシェル・コーディング環境、およびその構築のために作成した dotfiles の解説をします。
+
+dotfiles のリポジトリは、Ubuntu を入れたものとは別の PC で作成しており、次の記事で実際にそれを Ubuntu で展開します。
+
+以下は、自分が実際に使っている dotfiles のリポジトリを公開用に整えたものです。
+
+https://github.com/akTARDIGRADE13/dotfiles_public
+
+
+# chezmoi とは
+
+chezmoi は、複数環境の間で効率的に dotfiles を管理するためのツールです。
+
+https://www.chezmoi.io/
+
+読み方は「シェモア」で、フランス語で「私の家」という意味らしい。
+
+あらかじめリポジトリを用意しておけば、
+
+```bash
+$ chezmoi init git@github.com:<USER_NAME>/<REPO_NAME>.git
+```
+
+で dotfiles を展開できます。
+
+誤って dotfiles を消してしまった場合でも簡単に復旧できるので、単一環境で作業している場合でも有用だと思います。
+
+一度間違えて `.bashrc` を消してしまったときに、サークルの友人に教えてもらいました。
+
+導入方法に関しては、以下の記事にめちゃめちゃ詳しく書いてあるので割愛します。素晴らしい記事に感謝。
+
+https://qiita.com/CookieBox26/items/5c509f80768635b62629
+
+# シェル環境
+
+今まで素の bash を使っていたのですが、この機会に zsh や幾つかのプラグインを導入して、少しだけリッチにしてみたいと思いました。
+
+何か不満があったというよりは、単純な興味で色々触ってみようの気持ちです。
+
+試行錯誤を繰り返して、最終的に採用することになったツール・プラグインは以下の通りです。
+
+- ツール
+    - [Sheldon](https://sheldon.cli.rs/) : シェルプラグインを管理する CLI ツール
+    - [Starship](https://starship.rs/) : シェルプロンプト
+- プラグイン
+    - zsh-completions :  補完候補を増やす
+    - zsh-autosuggestions : 過去の履歴をもとにコマンドを補完する
+    - fast-syntax-highlighting : コマンドに色がつく
+
+StarShip は Nerd Font を要求します。フォントは [Firple](https://negset.com/Firple/) を採用しました。
+
+百聞は一見に如かずだと思うので、デモ動画を載せます。
+
+<Video
+  src={zsh}
+  alt="シェルのデモ動画"
+  caption="シェルのデモ動画"
+  autoplay
+  loop
+  muted
+  preload="metadata"
+/>
+
+キラキラしていてかっこいい！
+
+---
+
+プラグイン関連の設定は `~/.config/sheldon/plugins.toml` に、Starship 関連のカスタマイズは `~/.config/starship.toml` に書きます。
+
+TOML は見やすくていいですね。
+
+```toml title="~/.config/sheldon/plugins.toml"
+shell = "zsh"
+
+[plugins]
+
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+
+[plugins.fast-syntax-highlighting]
+github = "zdharma-continuum/fast-syntax-highlighting"
+```
+
+```toml title="~/.config/starship.toml"
+add_newline = false
+
+[directory]
+truncation_length = 3    # カレントフォルダを含めて3つまで表示
+truncate_to_repo = true  # gitリポジトリ内ではリポジトリより上のルートを省略
+
+[cmd_duration]
+min_time = 1000          # コマンドの実行時間が1000ミリ秒未満の場合は表示を省略
+format = "took [$duration]($style) "
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold blue)"`
+```
+
+関連する `~/.zshrc` の設定はこんな感じ。
+
+```zsh title="~/.zshrc"
+# =========================================
+# Plugin manager: sheldon
+# =========================================
+if command -v sheldon >/dev/null 2>&1; then
+    eval "$(sheldon source)"
+fi
+
+# =========================================
+# Completion
+# =========================================
+# 補完候補を Tab でメニュー選択できるようにする
+zstyle ':completion:*' menu select
+
+# 大文字・小文字を区別せずに補完する
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+# 補完候補の説明を表示する
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
+
+# 補完候補をグループ化する
+zstyle ':completion:*' group-name ''
+
+# 補完候補に色を付ける
+if [ -n "$LS_COLORS" ]; then
+    zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+fi
+
+autoload -Uz compinit
+
+# 補完キャッシュ
+ZSH_COMPDUMP="${ZDOTDIR:-$HOME}/.zcompdump"
+
+# .zcompdump が存在する場合はキャッシュを使う
+# 存在しない場合だけ通常の compinit で作成する
+if [ -f "$ZSH_COMPDUMP" ]; then
+    compinit -C -d "$ZSH_COMPDUMP"
+else
+    compinit -d "$ZSH_COMPDUMP"
+fi
+
+# =========================================
+# Key bindings
+# =========================================
+bindkey -v
+KEYTIMEOUT=1
+
+# zsh-autosuggestions の候補を Ctrl-Space / 右矢印で確定する
+bindkey '^ ' autosuggest-accept
+bindkey '^[[C' autosuggest-accept
+
+# =========================================
+# Prompt: starship
+# =========================================
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init zsh)"
+fi
+```
+
+# エディタ
+
+競技プログラミングをするときは Vim 、それ以外では基本的に Neovim を使っています。
+
+昔は VSCode を使っていたのですが、一昨年くらいから大会のために Vim を使い始めて、以降 Vim のキーバインドがないと生きていけない体になってしまいました。
+
+オンサイトの大会では `~/.vimrc` も手打ちする必要があるので、設定は少なめになっていると思います。
+
+```vim title="~/.vimrc"
+set noswapfile
+set tabstop=4
+set autoindent
+set shiftwidth=4
+set smartindent
+set number
+set mouse=a
+
+inoremap <silent> jj <ESC>
+```
+
+自分は `Esc` キーを叩くのがあまり得意ではないので、`jj` でノーマルモードに戻れるようにしています。
+
+## AstroNvim
+
+[AstroNvim](https://astronvim.com/) は、Neovim 用の設定・プラグイン構成をまとめた詰め合わせパックのようなものです。
+
+Neovim を使ってコーディングをする場合、基本的には何かしらのプラグインをインストールしながら、エディタを使いやすく改造していくことになると思います。
+
+ただ、プラグインにも色々種類はありますし、それらの違いを調べながら 0 からこの作業をするのは、初学者にとっては結構難しいのではないでしょうか。実際、自分は困りました。
+
+そこで自分が愛用しているのが、この AstroNvim です。
+
+https://astronvim.com/
+
+AstroNvim は便利な設定・プラグインをまとめてくれているので、これを導入するだけで最初からある程度リッチな環境でコーディングをすることができます。
+
+また、**設定は全て `~/.config/nvim` 配下にまとまっているので、これを chezmoi で管理することで、あとは Neovim さえインストールすれば、全く同じ環境をどこでも再現することができます**。
+
+<Video
+  src={astronvim}
+  alt="AstroNvimのデモ動画"
+  caption="AstroNvimのデモ動画"
+  autoplay
+  loop
+  muted
+  preload="metadata"
+/>
+
+マウスを一切触らずに、キーボードだけでサクサク作業が進むのがとても好みです。
+
+# 続く
+
+次に続きます。
+
+Ubuntu PC で dotfiles を展開し、環境を整えます。
+
+https://aktars-blog.com/blog/0013/
