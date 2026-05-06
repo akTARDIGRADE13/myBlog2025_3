@@ -47,6 +47,11 @@ export async function getMergedPosts(): Promise<UnifiedPost[]> {
     }));
 
     const merged = [...local, ...zenn];
-    merged.sort((a, b) => b.date.getTime() - a.date.getTime());
+    merged.sort((a, b) => {
+        const dateDiff = b.date.getTime() - a.date.getTime();
+        if (dateDiff !== 0) return dateDiff;
+
+        return String(b.id).localeCompare(String(a.id));
+    });
     return merged;
 }

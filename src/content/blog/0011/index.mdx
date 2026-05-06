@@ -1,0 +1,174 @@
+---
+id: "11"
+title: "Windows から Ubuntu へ移行した記録"
+date: "2026-05-04"
+updated: "2026-05-04"
+eyecatch: "./ubuntu_desktop.jpg"
+tags: ["Ubuntu 移行記録 2026", "Ubuntu", "Linux"]
+---
+
+# はじめに
+
+import Figure from "../../../components/Figure.astro";
+import Video from "../../../components/Video.astro";
+import ubuntu_desktop from "./ubuntu_desktop.jpg"
+import taskbar from "./taskbar.png"
+import ulauncher from "./ulauncher.webm"
+
+授業やサークル、研究室等で普段づかいしていた PC の OS を、 Windows から Ubuntu へ移行しました。
+
+Ubuntu へ移行してから、これまで通りコーディングができる環境を整えるまでに行った作業を、記事として残します。
+
+なるべく正確に記述するつもりですが、一通りの作業を終えてからこの記事を書き始めているため、細部に誤りがあるかもしれません。
+
+一つの記事にまとめると長くなりすぎるので、三つに分けました。
+
+- **[1. Windows から Ubuntu へ移行した記録](https://aktars-blog.com/blog/0011/)**　　　　　⬅ｲﾏｺｺ
+- [2. chezmoi を用いて dotfiles を管理する](https://aktars-blog.com/blog/0012/)
+- [3. Ubuntu PC のコーディング環境を整える](https://aktars-blog.com/blog/0013/)
+
+## 動機
+
+去年から Linux サーバーを触る機会が増えました。
+
+と同時に自分の知識不足を感じることも多くなり、Linux という OS に対する理解をもう少し深めたいと思うようになりました。
+
+コーディングをするうえで WSL (Ubuntu) は日常的に使っていますが、これまでは基礎的なファイル操作ができれば特に困ることはなかったんですよね。
+
+まぁ複雑な作業を要求されているわけではないので、今もそれはあまり変わらないのですが...。
+
+周りの友人や先輩が深そうな話をしていると、なんかかっこいいなと思うわけです。
+
+じゃあどうやって勉強しようかと考えたときに、やっぱり Linux が直接インストールされているマシンを普段から使うのがいいだろうと思い、ずっと移行のタイミングをうかがっていました。
+
+また、今回作業した PC の使用年数やスペックを思うと、このまま Windows 11 を使い続けることにも少し煩わしさを感じていました。
+
+今回このタイミングで移行に踏み切ったのは、「年度の区切りで一時的に PC がいろいろな作業から解放されたこと」、「研究発表などの大きなイベントが終わり、万が一元のデータがすべて消えてしまっても被害が比較的少ない時期だったこと」が大きな理由です。
+
+## PC のスペック
+
+購入したときの情報がすぐに見つからなかったので少し怪しいですが、多分これです。
+
+https://www.lenovo.com/jp/ja/p/laptops/thinkbook/thinkbook-series/thinkbook-13s-gen-2-intel/xxtbxtsi300?orgRef=https%3A%2F%2Fwww.google.com%2F&srsltid=AfmBOor3Q45r2aJWm1e7RxiHsnPHKApcXMS3WumhWLHGNU4mUxjJiDq7
+
+- Lenovo ThinkBook 13s Gen 2
+- CPU: インテル® Core™ i5-1135G7 プロセッサー
+- RAM: 8 GB
+- ストレージ: SSD 256 GB
+
+購入したのは大学入学時なので、4年ほど前ですね。
+
+## ディストリビューションの選定
+
+自分の周りにいる Linux ユーザーの方々に話を聞いて、自分の中で候補に挙がったのは以下の4つです。
+
+- Ubuntu
+- Debian
+- Arch Linux
+- NixOS
+
+色々悩みましたが、最終的には、「自分が Linux 初心者であること」、「WSL で使い慣れていること」を理由に Ubuntu を選びました。
+
+# Ubuntu のインストール
+
+本題です。
+
+まず、ポータブル SSD にデータのバックアップを取ります。
+
+次に、以下の記事を参考に Ubuntu をインストールします。
+
+https://note.com/itsuki_495/n/n4f90ad438d3b
+
+https://www.kkaneko.jp/tools/ubuntu/ubuntudesktop.html
+
+終わりです。素晴らしい記事に感謝。
+
+<Figure
+    src={ubuntu_desktop}
+    alt="インストール直後の様子"
+    caption="インストール直後の様子"
+/>
+
+手動で何かを設定するオプションも一切選ばなかったため、特に詰まることなくインストールできました。
+
+強いて言うなら BIOS の起動に手間取ったくらいですが、ファンクションキーを全探索することで解決。
+
+# インストール直後の作業
+
+`ctrl+alt+t` でターミナルを起動。
+
+## update
+
+```sh
+$ sudo apt update && apt list --upgradable && sudo apt upgrade -y
+```
+
+## 入力メソッドの設定
+
+友人の勧めで `fcitx + mozc` の形式を採用。
+
+```sh
+$ sudo apt install fcitx5 fcitx5-mozc
+$ im-config -n fcitx5
+$ sudo apt remove ibus
+$ sudo reboot
+```
+
+## ファイアーウォールの有効化
+
+```sh
+$ sudo ufw enable
+$ sudo ufw status verbose
+```
+
+## タスクバーの位置を変更
+
+タスクバーが左にあるのは落ち着かないので、「設定」→「Ubuntu Desktop」→「Dock」→「画面上の位置」を「下」に変更。
+
+<Figure
+    src={taskbar}
+    alt="タスクバーの位置の設定"
+    caption="タスクバーの位置の設定"
+/>
+
+<br/>
+<br/>
+
+---
+
+この辺りの記憶はかなり曖昧で、`.bash_history` から推測して書いている部分も多いです。
+
+# アプリ
+
+Discord と Chrome をとりあえず入れました。
+
+ブラウザも余裕ができたらちゃんと選定したいですね。Chrome はメモリをよく食うので...。
+
+Linux 向けのアプリでいうと、 **Ulauncher** というものを入れました。
+
+https://ulauncher.io/
+
+アプリ検索、サイトのショートカット、web検索など、色々できます。便利です。
+
+<Video
+  src={ulauncher}
+  alt="Ulauncher"
+  caption="Ulauncher"
+  autoplay
+  loop
+  muted
+  preload="metadata"
+/>
+
+自分は `ctrl + →` で起動するようにしているんですが、もう少しいいショートカットキーがあるような気がしていて、まだ模索中です。
+
+
+# 続く
+
+例に漏れずこの記事も情報量が少ないですね。
+
+そういう記事でも気にせずアップロードできるのが、個人サイトのいいところです。
+
+次に続きます。
+
+https://aktars-blog.com/blog/0012/
