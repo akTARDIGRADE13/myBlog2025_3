@@ -1,0 +1,106 @@
+---
+id: "15"
+title: "基底クラスのポインタで派生クラスを所有するときの注意"
+date: "2026-06-17"
+updated: "2026-06-17"
+eyecatch: "eyecatch.png"
+tags: [C++]
+---
+
+某所で怖いコードを見たような気がして、気になったので調べた内容をメモしておく。
+
+## 怖かったもの
+
+構造だけ再現するとこんな感じ。
+
+```cpp title='test.cpp'
+#include <iostream>
+
+struct Base {
+  ~Base() {
+    std::cout << "Base::~Base()\n";
+  }
+};
+
+struct Derived : Base {
+  int* data;
+
+  Derived() : data(new int[100]) {
+    std::cout << "Derived::Derived()\n";
+  }
+
+  ~Derived() {
+    std::cout << "Derived::~Derived()\n";
+    delete[] data;
+  }
+};
+
+int main() {
+  Base* p = new Derived{};
+  delete p;
+}
+```
+
+まずこの仕様をちゃんと把握してなかったんだけど、派生クラスへのポインタは、アクセス可能な基底クラスへのポインタに暗黙変換できるらしい。
+
+> Because of the derived-to-base implicit conversion for pointers, pointer to a base class can be initialized with the address of a derived class 
+
+https://en.cppreference.com/cpp/language/pointer
+
+
+怖かったのは `delete p;` の部分で、この場合に `new Derived{}` で作った `Derived` オブジェクトが正しく破棄されるのか、具体的には「基底クラスのデストラクタが仮想関数でないのに、 `Derived::~Derived()` もきちんと呼ばれて `data` が解放されるのか」がわからなかった。
+
+## 結論
+
+上述のコードを手元で実行してみる。
+
+```sh
+$ g++ test.cpp -std=c++11
+$ ./a.out
+Derived::Derived()
+Base::~Base()
+```
+
+うん、ダメそう。
+
+そもそもの話、派生クラスのオブジェクトを基底クラスのポインタ越しに `delete` する場合、基底クラスのデストラクタは `virtual` でないと未定義動作になる。
+
+> If `ptr` is a pointer to a base class subobject of the object that was allocated with new, the destructor of the base class must be virtual, otherwise the behavior is undefined.
+
+https://en.cppreference.com/cpp/language/delete
+
+## 直す
+
+基底クラスのデストラクタを `virtual` にすればよい。
+
+```cpp
+#include <iostream>
+
+struct Base {
+  virtual ~Base() {
+    std::cout << "Base::~Base()\n";
+  }
+};
+
+struct Derived : Base {
+  int* data;
+
+  Derived() : data(new int[100]) {
+    std::cout << "Derived::Derived()\n";
+  }
+
+  ~Derived() override {
+    std::cout << "Derived::~Derived()\n";
+    delete[] data;
+  }
+};
+
+int main() {
+  Base* p = new Derived{};
+  delete p;
+}
+```
+
+--- 
+
+余談だけど、一通りの検証と執筆を終えたあとで、改めてもとのプログラム（だと思っていたもの）を確認しにいったら、ちゃんと `virtual` がついていて「俺は何を見たんだ...？」になっている。
